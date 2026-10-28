@@ -21,7 +21,8 @@ route that needs no platform permission, and left the platform routes as disable
 ## Real command output
 ```
 $ npm run ci   (tail)
-  70:9  error  The value assigned to 'files' is not used in subsequent statements  no-useless-assignment
-
-✖ 1 problem (1 error, 0 warnings)
+ Test Files  11 passed (11)
+      Tests  109 passed (109)
+   Start at  00:19:44
+   Duration  697ms (tests 45%, import 33%, transform 20%, worker 2%)
 ```

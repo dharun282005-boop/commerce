@@ -67,7 +67,7 @@ export class ManualImportAdapter implements SourceAdapter {
     this.records = [];
     this.reports = [];
     if (!this.dir) return [];
-    let files: string[] = [];
+    let files: string[];
     try {
       files = readdirSync(this.dir)
         .filter((f) => /\.(json|csv)$/i.test(f))
