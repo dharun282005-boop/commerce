@@ -32,8 +32,21 @@ of truth for package versions) and pinned exactly in `package.json`.
 | eslint / typescript-eslint | 10.13.0 / 8.72.1 | Lint | https://eslint.org/docs/latest/ · https://typescript-eslint.io |
 | prettier | 3.9.10 | Formatting | https://prettier.io/docs/ |
 
-Later phases (versions checked again when the phase starts): next 16.x, react 19.x, next-intl 4.x,
-tailwindcss 4.x, bullmq 6.x, @anthropic-ai/sdk, Playwright.
+Added in later phases (all pinned exactly):
+
+| Package | Version | Purpose | Docs |
+|---------|---------|---------|------|
+| next / react / react-dom | 16.4.3 / 19.3.1 / 19.3.1 | Web app | https://nextjs.org/docs |
+| next-intl | 4.14.9 | English/Tamil | https://next-intl.dev |
+| tailwindcss / @tailwindcss/postcss | 4.3.3 | Styling | https://tailwindcss.com/docs |
+| @anthropic-ai/sdk | 1.3.0 | Claude API (agent) | https://docs.claude.com |
+| @playwright/test / @axe-core/playwright | 1.64.1 / 4.14.0 | e2e, accessibility | https://playwright.dev |
+| @fastify/cors / helmet / rate-limit | 11.3.1 / 13.2.0 / 11.2.1 | API hardening | https://github.com/fastify |
+| nodemailer | 10.2.1 | Alert email | https://nodemailer.com |
+| autocannon | 8.0.0 | Load test | https://github.com/mcollina/autocannon |
+| `axllent/mailpit:v1.27` image | — | Dev mail catcher | https://mailpit.axllent.org |
+
+BullMQ was not needed: alert checks run inline on fresh observations (no background jobs yet).
 
 ### Why TypeScript 6.0 and not 7.0
 
@@ -61,7 +74,7 @@ cp .env.example .env              # nothing secret is needed for fixture mode
 npm install
 
 # 3. Run everything in Docker
-docker compose up --build         # postgres + redis + api on http://localhost:4100
+docker compose up --build         # postgres + redis + mailpit + api (:4100) + web (:3100)
                                   # (port 4100 because 4000 was already in use on the owner's Mac)
 
 # or run the API on the host with only the databases in Docker

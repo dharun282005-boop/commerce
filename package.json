@@ -19,14 +19,18 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
-    "ci": "npm run lint && npm run typecheck && npm test",
+    "ci": "npm run lint && npm run typecheck && npm test && npm run secrets",
     "eval": "tsx apps/api/eval/run.ts",
     "dev:web": "npm run dev -w @cuc/web",
-    "e2e": "npm run e2e -w @cuc/web"
+    "e2e": "npm run e2e -w @cuc/web",
+    "secrets": "node scripts/secrets-scan.mjs",
+    "audit": "npm audit --omit=dev",
+    "loadtest": "node scripts/loadtest.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "26.6.5",
+    "autocannon": "8.0.0",
     "eslint": "10.13.0",
     "prettier": "3.9.10",
     "tsx": "4.23.15",

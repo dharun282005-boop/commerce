@@ -7,9 +7,13 @@
 | `npm test` | Vitest across all workspaces |
 | `npm run lint` | ESLint + Prettier check |
 | `npm run typecheck` | `tsc --noEmit` per workspace |
-| `npm run ci` | lint + typecheck + test (no Docker needed) |
+| `npm run ci` | lint + typecheck + unit/service tests + secrets scan (no Docker needed) |
 | `npm run test:integration` | API + Postgres + Redis tests (needs `docker compose up -d postgres redis`) |
-| `npm run eval` | Agent scenarios (Phase E) |
+| `npm run eval` | 162 agent scenarios → docs/progress/phase-E-eval.md (`EVAL_MODEL=claude` for Claude) |
+| `npm run eval:match -w @cuc/core` | Matching precision/recall → docs/progress/phase-C-eval.md |
+| `npm run e2e` | Playwright: US-1..4, assistant, Tamil, axe, LCP, offline (builds the web app) |
+| `npm run loadtest` | autocannon against an API started with `RATE_LIMIT=off` |
+| `npm run secrets` / `npm run audit` | Secrets scan / production dependency audit |
 
 ## Test pyramid
 

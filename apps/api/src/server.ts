@@ -17,6 +17,7 @@ if (config.REDIS_URL) {
   const redis = new Redis(config.REDIS_URL, { maxRetriesPerRequest: 1, enableOfflineQueue: false });
   redis.on('error', () => {}); // errors surface through /health and the cache wrapper
   deps.cache = new RedisCache(redis);
+  deps.redis = redis;
   deps.pingRedis = async () => (await redis.ping()) === 'PONG';
   closers.push(() => redis.quit());
 }

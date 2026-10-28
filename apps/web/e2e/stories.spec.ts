@@ -4,6 +4,8 @@ import { expect, test, type Page } from '@playwright/test';
 const rupees = (s: string) => Number(s.replace(/[^\d.]/g, ''));
 
 async function cards(page: Page) {
+  // Wait for the results region to finish loading (a preset click triggers a new request).
+  await expect(page.locator('main [aria-live="polite"][aria-busy="false"]').first()).toBeAttached();
   const list = page.locator('main ol > li article');
   await expect(list.first()).toBeVisible();
   return list;
@@ -18,6 +20,7 @@ test('US-1: S24 FE 128GB in Velachery: only 128 GB, several sources, fresh and l
   await page.getByLabel('Locality or pincode').fill('Velachery');
   await page.getByRole('button', { name: 'Compare' }).click();
   await page.getByRole('button', { name: 'Cheapest' }).click();
+  await expect(page).toHaveURL(/preset=cheapest/);
   const list = await cards(page);
   const n = await list.count();
   expect(n).toBeGreaterThanOrEqual(4);

@@ -33,3 +33,5 @@
 | `fixtures/sources.ts` | Terms-of-Service URLs for each platform have not been opened/verified |
 | 10, `messages/ta.json` | Tamil UI strings, checked by a native reader |
 | 10 | Manual screen-reader pass (VoiceOver/TalkBack) |
+| deployment-guide | Current free tiers / prices of hosting providers |
+| 08, eval | Run `EVAL_MODEL=claude npm run eval` once an API key is available (costs money) |

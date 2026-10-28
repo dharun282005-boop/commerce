@@ -122,6 +122,29 @@ Adapter framework → normalisation → matching → ranking → API → web app
 No scraping against Terms, no anti-bot evasion, no purchases, no stored credentials, no invented
 ratings, labelled sample data, affiliate links that never change ranking, and minimal personal data.
 
-## 10. Conclusion
+## 10. Results (measured 2026-10-29, sample data)
 
-To be written in Phase G with measured results.
+| What | Result | Target | Evidence |
+|------|--------|--------|----------|
+| Matching | 391 labelled pairs (224 hard negatives): precision 1.000, recall 0.988; held-out 60 pairs P 1.000 / R 0.923 (optimistic: rules were tuned after a first run at P 0.714 / R 0.577) | P ≥ 0.95, R ≥ 0.85 | progress/phase-C-eval.md |
+| Ranking maths | Hand-computed cases pass (₹276.45 landed; 4.051 vs 4.495; score 0.85) | 100% | phase-c.test.ts |
+| Affiliate independence | 200 randomised trials, identical order and scores | always | phase-c.test.ts |
+| Cart split | App uses exact search for ≤ 20,000 combinations; heuristic optimal in 97% of 1,000 random lists, mean gap 0.22%, worst 21.6% | ≤ 2% mean | progress/phase-C.md |
+| Agent | 162 scenarios (≥ 40 per vertical) incl. 12 injection + universal safety checks: 162/162 with the **offline planner**; Claude not yet evaluated (no API key) | ≥ 40 each | progress/phase-E-eval.md |
+| Web | 4 headline stories pass end to end; axe 0 serious/critical on 7 pages; LCP 552 ms throttled mobile | LCP < 2.5 s | progress/phase-F.md |
+| Robustness | One source failing never fails a search; circuit breaker, retries, timeouts tested | — | guarded.test.ts, eval "source_down" |
+| Load | Search ~3,200 req/s cached, ~2,000 req/s uncached, p99 ≤ 18 ms (20 connections, laptop) | — | progress/phase-G.md |
+
+## 11. Conclusion
+
+The project shows that an explainable, compliance-first comparison service across four very different verticals is
+practical: a single canonical offer model, landed cost, volume-adjusted ratings and a transparent weighted score make
+rankings both useful and defensible, and a deterministic matcher with a variant veto avoids the most damaging error
+(merging different variants). Building the data layer as a tiered, switchable adapter framework kept the legal
+question explicit: today every price is labelled sample data, and the routes to real data (official APIs, ONDC,
+owner and user data) are implemented or stubbed but switched off pending approval.
+
+The main limitations are the sample data itself, matching numbers measured partly on data written for the project,
+the agent being evaluated only with the offline planner, and Tamil strings awaiting a native reviewer. Next steps:
+run `EVAL_MODEL=claude npm run eval` with an API key, collect a fresh set of real product titles for matching,
+and seek approval for the first real source (most likely an official affiliate API).

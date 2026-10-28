@@ -76,6 +76,7 @@ async function makeApp(model: AgentModel, failing: boolean) {
   return buildApp({
     config: loadConfig({
       LOG_LEVEL: 'silent',
+      RATE_LIMIT: 'off',
       ...(failing
         ? {
             FIXTURE_FAIL:

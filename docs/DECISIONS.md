@@ -14,3 +14,9 @@
 | 2026-10-28 | Run TS with `tsx` (no build step) in dev and in the container | Simpler for a student project | `tsc` build + `node dist` (revisit in Phase G) |
 | 2026-10-28 | Fixtures as typed TS modules | Compile-time checking against the schemas | JSON files (see PROPOSALS P2) |
 | 2026-10-28 | Supertest against `app.server` | Brief asks for Supertest | Fastify `inject` only |
+| 2026-10-29 | Exact cart search when ≤ 20,000 combinations, heuristic above | Heuristic worst case 21.6% on random lists | Heuristic only |
+| 2026-10-29 | Flagged offers listed last (not hidden) and never used in carts or agent recommendations | Keeps the honest score visible while protecting users | Hide flagged offers; rank normally |
+| 2026-10-29 | Offline rule-based planner when no Anthropic key is configured | No credentials on the owner's machine; keeps the app usable and the eval runnable | Agent disabled without a key |
+| 2026-10-29 | Strict per-source rate limits only for real sources | Sample/local sources starved under eval load | One limit for all |
+| 2026-10-29 | Alerts identity = signed email link (no passwords, no cookies) | Minimal personal data; no CSRF surface | OAuth / password accounts |
+| 2026-10-29 | API port 4100, web 3100 | Port 4000 was in use on the owner's Mac | — |

@@ -31,6 +31,9 @@ import type { Config } from './config.ts';
 import { Metrics } from './metrics.ts';
 import { randomBytes } from 'node:crypto';
 import fastifyCors from '@fastify/cors';
+import fastifyHelmet from '@fastify/helmet';
+import fastifyRateLimit from '@fastify/rate-limit';
+import type { Redis } from 'ioredis';
 import { AlertService } from './alerts/service.ts';
 import { MemoryAlertStore, type AlertStore } from './alerts/store.ts';
 import { MemoryNotifier, SmtpNotifier, type Notifier } from './alerts/notify.ts';
@@ -56,6 +59,10 @@ export interface AppDeps {
   now?: () => Date;
   submissionStore?: SubmissionStore;
   alertStore?: AlertStore;
+  /** Where logs go (tests capture them). Default: stdout. */
+  logStream?: { write: (msg: string) => void };
+  /** Shared Redis client: rate-limit counters live here when present (works across API instances). */
+  redis?: Redis;
   notifier?: Notifier;
   /** Agent model; default: Claude if ANTHROPIC_MODEL + credentials are set, else the offline planner. */
   agentModel?: AgentModel;
@@ -77,6 +84,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         ? false
         : {
             level: config.LOG_LEVEL,
+            ...(deps.logStream ? { stream: deps.logStream } : {}),
             // Rule 6: never log secrets or personal data. Bodies (which hold search text) are not logged.
             redact: [
               'req.headers.authorization',
@@ -90,6 +98,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       return typeof incoming === 'string' && /^[\w-]{8,64}$/.test(incoming) ? incoming : randomUUID();
     },
     bodyLimit: 256 * 1024,
+    trustProxy: config.TRUST_PROXY === 'true',
   }).withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(validatorCompiler);
@@ -104,6 +113,48 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       status: String(reply.statusCode),
     });
   });
+
+  // Security headers. The API serves JSON, so its CSP is "nothing may load"; /docs (Swagger UI) keeps
+  // helmet's other headers but needs its own scripts and styles.
+  await app.register(fastifyHelmet, {
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'same-site' },
+  });
+  app.addHook('onSend', async (req, reply) => {
+    if (!req.url.startsWith('/docs'))
+      reply.header('content-security-policy', "default-src 'none'; frame-ancestors 'none'");
+  });
+
+  // Per-IP rate limits (brief §9). Expensive or abusable routes get tighter limits.
+  const STRICT: Record<string, number> = {
+    '/v1/agent': 30,
+    '/v1/submissions': 10,
+    '/v1/alerts': 5,
+    '/v1/alerts/verify': 20,
+    '/v1/admin/import': 20,
+  };
+  app.addHook('onRoute', (route) => {
+    const max = STRICT[route.url];
+    if (max)
+      route.config = {
+        ...(route.config as object),
+        rateLimit: { max, timeWindow: '1 minute' },
+      } as typeof route.config;
+  });
+  if (config.RATE_LIMIT === 'on') {
+    await app.register(fastifyRateLimit, {
+      global: true,
+      max: config.RATE_LIMIT_MAX,
+      timeWindow: '1 minute',
+      ...(deps.redis ? { redis: deps.redis, nameSpace: 'cuc-rl:' } : {}),
+      allowList: (req) => req.url === '/health' || req.url === '/metrics',
+      errorResponseBuilder: (_req, ctx) => ({
+        statusCode: 429,
+        error: 'rate_limited',
+        message: `Too many requests. Try again in ${ctx.after}.`,
+      }),
+    });
+  }
 
   // The web app runs on its own origin; only it may call the API from a browser.
   await app.register(fastifyCors, {
@@ -215,9 +266,15 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         status: 'ok' as const,
         db: await check(deps.pingDb),
         redis: await check(deps.pingRedis),
+        // True when no enabled source fetches real platform data (fixtures, own imports, user reports, mocks).
         fixtureMode: guarded
           .filter((g) => g.isAllowed().allowed)
-          .every((g) => g.adapter.compliance.tier === 'fixture' || g.adapter.compliance.tier === 3),
+          .every(
+            (g) =>
+              g.adapter.compliance.tier === 'fixture' ||
+              g.adapter.compliance.tier === 3 ||
+              g.adapter.id.endsWith('-mock'),
+          ),
       };
     },
   );

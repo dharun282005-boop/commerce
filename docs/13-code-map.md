@@ -1,36 +1,37 @@
-# 13 · Code map (as of Phase B)
+# 13 · Code map
 
 ```
 .
-├── PROMPT.md                     Owner's brief (source of truth for scope)
-├── docker-compose.yml            postgres (pgvector:pg17) + redis:8 + api on :4100
-├── package.json                  npm workspaces + root scripts (ci, test, lint, db:*)
-├── vitest.config.ts              two test projects: unit (no Docker) and integration
-├── packages/core/                Pure TypeScript, no I/O except fixtures
-│   ├── src/money.ts              paise helpers, Indian number formatting
-│   ├── src/units.ts              "2 kg" → 2000 g, price per 100 g
-│   ├── src/schemas.ts            Zod canonical Offer (4 verticals), SearchQuery, filters
-│   ├── src/localities.ts         22 Chennai localities + OMR corridor, resolveArea()
-│   ├── src/text.ts               tokenizer used by fixture search
-│   ├── src/search.ts             searchAll(): fan out, isolate failures, filter, sort
-│   ├── src/adapters/types.ts     SourceAdapter, Compliance, SourceResult, SourceError
-│   ├── src/adapters/resilience.ts  MemoryCache, TokenBucket, CircuitBreaker, backoff
-│   ├── src/adapters/guarded.ts   GuardedAdapter: gate → cache → rate limit → breaker → timeout → retry → validate
-│   ├── src/adapters/fixture.ts   FixtureAdapter + FIXTURE_FAIL simulation
-│   └── src/fixtures/*.ts         sample data: sources, shopping, food, grocery, property
-├── packages/db/                  Postgres via Drizzle
-│   ├── src/schema.ts             localities, sources, offers, price_observations
-│   ├── migrations/0000…0002      extensions, tables (generated), append-only trigger
-│   ├── src/observations.ts       ObservationStore.record(): upsert snapshot + append history
-│   ├── src/seed.ts               loads localities, sources, one snapshot of every fixture
-│   └── src/migrate.ts            applies migrations
-└── apps/api/                     Fastify HTTP service
-    ├── src/app.ts                routes: /health /metrics /v1/localities /v1/sources /v1/search, OpenAPI at /docs
-    ├── src/server.ts             wiring: Redis cache, Postgres, migrate+seed on start, graceful shutdown
-    ├── src/config.ts             env parsing (Zod)
-    ├── src/redis-cache.ts        Cache implementation on Redis (PX TTL)
-    ├── src/metrics.ts            Prometheus-style counters
-    └── Dockerfile                node:24-alpine, runs with tsx
+├── PROMPT.md, README.md          Brief and quick start
+├── docker-compose.yml            postgres(pgvector) · redis · mailpit · api :4100 · web :3100
+├── data/imports/                 YOUR data: CSV/JSON files loaded by the manual-import adapter
+├── scripts/                      secrets-scan.mjs, loadtest.mjs
+├── packages/core/                Pure TypeScript domain logic
+│   ├── src/schemas.ts money.ts units.ts localities.ts text.ts safety.ts
+│   ├── src/adapters/             types, resilience (cache, token bucket, breaker), guarded wrapper,
+│   │                             fixture, manual-import, user-submitted, ondc (+ mock), official stubs, offer-query
+│   ├── src/net/url-guard.ts      SSRF guard for submitted links
+│   ├── src/rank/                 landed cost, Bayesian rating, best-value score + explanations
+│   ├── src/match/match.ts        layered entity resolution + grouping
+│   ├── src/cart/cart.ts          list parser, exact + heuristic cart splitting
+│   ├── src/property/property.ts  dedupe, price-per-sqft medians, scam/stale flags
+│   ├── src/history/history.ts    history store interface, MRP check, sample history
+│   ├── src/compare.ts            one call: group → dedupe → rank → flag
+│   ├── src/fixtures/             sample data (4 verticals, 17 sources)
+│   └── eval/                     matching eval set + report, cart benchmark
+├── packages/db/                  Drizzle schema, SQL migrations (0000–0003), seed, observation + history stores
+├── apps/api/                     Fastify service
+│   ├── src/app.ts server.ts config.ts services.ts schemas.ts metrics.ts redis-cache.ts
+│   ├── src/routes/               core (search, explain, cart, offers, localities, sources), data, alerts, agent
+│   ├── src/agent/                tools, prompt, models (Claude), scripted (offline planner), loop (caps, grounding)
+│   ├── src/alerts/               tokens, stores (memory/Postgres), notifiers (SMTP, memory, web-push stub), service
+│   └── eval/                     162 agent scenarios, adversarial seller, runner
+└── apps/web/                     Next.js app
+    ├── src/app/[locale]/         pages: home, results, item/[id], property/[id], agent, grocery, saved,
+    │                             admin/sources, about, alerts/verify
+    ├── src/components/           SearchForm, ResultsView, OfferCard, PriceChart, DetailView, Chat, …
+    ├── src/i18n/ src/proxy.ts    next-intl routing (en, ta)
+    ├── messages/en.json ta.json  every UI string
+    ├── public/sw.js              offline service worker
+    └── e2e/stories.spec.ts       Playwright tests
 ```
-
-Tests sit next to each package in `test/`. `*.integration.test.ts` files need Docker.
