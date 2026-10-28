@@ -43,6 +43,8 @@ services:
       ALERT_SECRET: ${ALERT_SECRET:-dev-only-alert-secret-change-me}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
     ports: ['4100:4100']
     depends_on:
       postgres: { condition: service_healthy }

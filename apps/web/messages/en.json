@@ -171,13 +171,14 @@
     "send": "Send",
     "thinking": "Working…",
     "checked": "What I checked",
-    "offline": "Offline assistant (rule-based): add an Anthropic API key on the server to use Claude.",
-    "live": "Powered by Claude",
+    "offline": "Offline assistant (rule-based). Add a GEMINI_API_KEY or Anthropic key on the server to use a live model.",
+    "live": "Powered by {model}",
     "ungrounded": "Some numbers in this answer could not be matched to a source. Check the cards below.",
     "consent": "Remember my locality, budget and veg preference on this device",
     "open": "Ask the assistant",
     "close": "Close assistant",
-    "clear": "New conversation"
+    "clear": "New conversation",
+    "fallback": "The live assistant is busy, so the offline assistant answered."
   },
   "grocery": {
     "title": "Grocery list planner",
@@ -232,5 +233,16 @@
     "privacyTitle": "Your data",
     "privacy": "Pincode or locality is enough; we do not ask for your precise location. Alerts store only your email and the alert. You can download or delete them from Saved.",
     "sources": "See every source and its status"
+  },
+  "home": {
+    "headline": "Pay less in Chennai.",
+    "searchTitle": "Compare the total price",
+    "howTitle": "How it works",
+    "totalTitle": "The real total",
+    "totalBody": "Item + delivery + fees + taxes − verified coupons. No surprises at checkout.",
+    "whyTitle": "Every rank explained",
+    "whyBody": "Ratings are adjusted for how many reviews they have, and you can see exactly why an offer is first.",
+    "trustTitle": "Scams flagged",
+    "trustBody": "Prices that look too good, advance-payment requests and copied listings are marked and moved down."
   }
 }

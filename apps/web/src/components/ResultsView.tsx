@@ -80,7 +80,7 @@ export default function ResultsView() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('rankBy')}>
-        <span className="text-sm text-ink-2">{t('rankBy')}:</span>
+        <span className="text-[15px] text-ink-2">{t('rankBy')}:</span>
         {PRESETS.map((p) => (
           <button
             key={p}
@@ -90,14 +90,14 @@ export default function ResultsView() {
               setCustom(null);
               setParam({ preset: p });
             }}
-            className={`rounded-full px-3 py-1 text-sm ${!custom && preset === p ? 'bg-accent text-accent-fg' : 'border border-line text-ink-2'}`}
+            className="chip"
           >
             {t(`presets.${p}`)}
           </button>
         ))}
       </div>
 
-      <details className="rounded border border-line bg-surface p-3 text-sm">
+      <details className="card !p-5 text-[15px]">
         <summary className="cursor-pointer text-ink-2">{t('customWeights')}</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {(['cost', 'rating', 'speed', 'trust'] as const).map((k) => (
@@ -121,11 +121,11 @@ export default function ResultsView() {
 
       <div aria-live="polite" aria-busy={loading}>
         {loading && <p className="text-ink-2">{t('loading')}</p>}
-        {error && <p className="rounded bg-bad-bg p-3 text-bad-fg">{error}</p>}
+        {error && <p className="rounded-[24px] bg-coral-tint p-4">{error}</p>}
         {data && !loading && (
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-lg font-semibold">
+              <h2 className="t-heading-sm">
                 {t('title', { count: data.results.length, area: data.area.label })}
               </h2>
               {data.results.length > 1 && (
@@ -133,7 +133,7 @@ export default function ResultsView() {
                   type="button"
                   aria-pressed={table}
                   onClick={() => setTable(!table)}
-                  className="rounded border border-line px-3 py-1 text-sm"
+                  className="btn btn-ghost !py-2"
                 >
                   {t('compareTable')}
                 </button>
@@ -142,10 +142,10 @@ export default function ResultsView() {
             <SourceStrip sources={data.sources} />
             {data.results.length === 0 && <p className="text-ink-2">{t('empty')}</p>}
             {table && (
-              <div className="overflow-x-auto rounded border border-line bg-surface">
-                <table className="w-full text-sm">
+              <div className="overflow-x-auto rounded-[32px] bg-surface p-3">
+                <table className="w-full text-[15px]">
                   <caption className="sr-only">{t('compareTable')}</caption>
-                  <thead className="bg-surface-2 text-left text-ink-2">
+                  <thead className="text-left text-ink-2">
                     <tr>
                       <th scope="col" className="p-2">
                         {t('rank')}
@@ -223,9 +223,9 @@ function Filters({
       ]),
     ),
   );
-  const field = 'rounded border border-line bg-surface px-2 py-1 text-ink';
+  const field = 'field !rounded-[14px] !py-2';
   return (
-    <details className="rounded border border-line bg-surface p-3 text-sm" open={vertical !== 'shopping'}>
+    <details className="card !p-5 text-[15px]" open={vertical !== 'shopping'}>
       <summary className="cursor-pointer text-ink-2">{t('filters')}</summary>
       <form
         className="mt-3 flex flex-wrap items-end gap-3"
@@ -315,7 +315,7 @@ function Filters({
             </label>
           </>
         )}
-        <button type="submit" className="rounded bg-accent px-3 py-1.5 font-medium text-accent-fg">
+        <button type="submit" className="btn btn-primary">
           {t('apply')}
         </button>
       </form>

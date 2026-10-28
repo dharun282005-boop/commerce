@@ -30,6 +30,18 @@ Docs read: https://next-intl.dev/docs/routing/setup, https://nextjs.org/docs.
 - Affiliate links carry a visible "affiliate link" label.
 - WhatsApp share uses `https://wa.me/?text=<encoded summary>` with no personal data.
 
+## Visual design (2026-10-29)
+
+Owner-provided "cream paper storybook" reference: cream `#f5f1e4` canvas, white cards (32 px radius, 50 px for
+large sheets), floating white pill navigation, green `#8ed462` structural accent (selected chips, menu toggle,
+logo), coral `#ff705d` primary actions with a small white dot, sky `#2ba0ff` dots on secondary actions, yellow
+`#f5e211` footer band, Inter 400/500 for everything (Noto Sans Tamil for Tamil), display headings with tight
+tracking, flat surfaces (no shadows), paper-cut inline SVG illustrations (`components/Art.tsx`).
+
+WCAG AA deviations from the reference: muted text `#5c5e5a` instead of Stone Gray (3.4:1), ink text on coral
+instead of white (2.7:1), green never used for text or focus rings (1.6:1 on cream; focus rings are ink),
+display/heading sizes scale down on phones (and further for Tamil) so words fit.
+
 ## Components
 
 `SearchForm`, `LocalityInput` (datalist of 22 localities, Tamil names, pincodes), `ResultsView` (presets, weight
@@ -39,7 +51,7 @@ tooltip, keyboard arrows, table view), `AlertForm`, `Chat` + `ChatLauncher` (SSE
 cards, consented preferences), `GroceryPlanner`, `SavedView` (localStorage + export/delete my data), `SourcesView`.
 
 Chart colours follow the dataviz reference palette (series-1 `#2a78d6` light / `#3987e5` dark) with a recessive grid.
-Light/dark come from the system setting (CSS tokens in `globals.css`).
+Light theme only (the reference is light); tokens live in `globals.css`.
 
 ## Quality budgets
 

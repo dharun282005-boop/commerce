@@ -1,13 +1,30 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, Noto_Sans_Tamil } from 'next/font/google';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import ChatLauncher from '@/components/ChatLauncher';
+import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import SWRegister from '@/components/SWRegister';
 import { routing } from '@/i18n/routing';
 import '../globals.css';
+
+// Self-hosted at build time by next/font (no runtime requests to Google, CSP stays 'self').
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+const tamil = Noto_Sans_Tamil({
+  subsets: ['tamil'],
+  weight: ['400', '500'],
+  variable: '--font-tamil',
+  display: 'swap',
+  preload: false,
+});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -29,10 +46,7 @@ export async function generateMetadata({
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fcfcfb' },
-    { media: '(prefers-color-scheme: dark)', color: '#1a1a19' },
-  ],
+  themeColor: '#f5f1e4',
   width: 'device-width',
   initialScale: 1,
 };
@@ -50,16 +64,16 @@ export default async function LocaleLayout({
   const messages = await getMessages();
   const t = await getTranslations('app');
   return (
-    <html lang={locale}>
-      <body className="min-h-screen bg-bg text-ink">
+    <html lang={locale} className={`${inter.variable} ${tamil.variable}`}>
+      <body className="min-h-screen bg-bg text-ink antialiased">
         <NextIntlClientProvider messages={messages}>
           <Suspense>
             <Header />
           </Suspense>
-          <main id="main" className="mx-auto max-w-5xl px-4 py-6 pb-24">
+          <main id="main" className="mx-auto max-w-[1200px] px-4 pb-24 pt-6 sm:px-6">
             {children}
           </main>
-          <footer className="mx-auto max-w-5xl px-4 pb-24 text-xs text-ink-3">{t('footer')}</footer>
+          <Footer note={t('footer')} />
           <ChatLauncher />
           <SWRegister />
         </NextIntlClientProvider>

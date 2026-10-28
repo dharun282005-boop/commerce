@@ -37,10 +37,10 @@ export default function SourcesView() {
   }, []);
   if (!rows) return <p className="text-ink-2">…</p>;
   return (
-    <div className="overflow-x-auto rounded border border-line bg-surface">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto rounded-[32px] bg-surface p-3">
+      <table className="w-full text-[15px]">
         <caption className="sr-only">{t('title')}</caption>
-        <thead className="bg-surface-2 text-left text-ink-2">
+        <thead className="text-left text-ink-2">
           <tr>
             <th scope="col" className="p-2">
               {t('id')}
@@ -70,7 +70,7 @@ export default function SourcesView() {
             <tr key={s.id} className="border-t border-line align-top">
               <th scope="row" className="p-2 text-left font-medium">
                 {s.name}
-                <span className="block text-xs font-normal text-ink-3">
+                <span className="block text-[13px] font-normal text-ink-3">
                   {s.id} · {s.verticals.join(', ')}
                 </span>
               </th>
@@ -82,11 +82,11 @@ export default function SourcesView() {
                 {s.health.adapter.ok ? '✓' : '✗'} {s.health.adapter.detail}
               </td>
               <td className="p-2">{s.health.breaker}</td>
-              <td className="p-2 text-xs">
+              <td className="p-2 text-[13px]">
                 {s.health.lastSuccessAt ? new Date(s.health.lastSuccessAt).toLocaleTimeString() : '–'}
                 {s.health.lastError && <span className="block text-bad-fg">{s.health.lastError}</span>}
               </td>
-              <td className="p-2 text-xs text-ink-2">{s.compliance.notes}</td>
+              <td className="p-2 text-[13px] text-ink-2">{s.compliance.notes}</td>
             </tr>
           ))}
         </tbody>

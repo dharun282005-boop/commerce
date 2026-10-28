@@ -71,9 +71,10 @@ export async function agentRoutes(
   app.get('/v1/agent/status', { schema: { tags: ['agent'] } }, async () => ({
     model: opts.model.name,
     live: opts.model.live,
+    available: (opts.model as { available?: boolean }).available ?? true,
     note: opts.model.live
-      ? 'Claude via the Anthropic API.'
-      : 'Offline planner (no ANTHROPIC_API_KEY / ANTHROPIC_MODEL set). Same tools and safety checks, rule-based language understanding.',
+      ? `Live model: ${opts.model.name}. If it is unavailable, the offline assistant answers instead.`
+      : 'Offline planner (no Gemini or Anthropic key configured). Same tools and safety checks, rule-based language understanding.',
   }));
 
   app.post(

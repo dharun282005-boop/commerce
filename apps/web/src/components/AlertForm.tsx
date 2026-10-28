@@ -11,7 +11,7 @@ export default function AlertForm({ offerId, suggestedRs }: { offerId: string; s
   const [state, setState] = useState<'idle' | 'sent' | string>('idle');
   return (
     <form
-      className="space-y-2 rounded border border-line bg-surface p-3 text-sm"
+      className="space-y-2 card !p-5 text-[15px]"
       onSubmit={async (e) => {
         e.preventDefault();
         try {
@@ -34,7 +34,7 @@ export default function AlertForm({ offerId, suggestedRs }: { offerId: string; s
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded border border-line bg-surface px-2 py-1"
+          className="field mt-1"
         />
       </label>
       <label className="block">
@@ -44,10 +44,10 @@ export default function AlertForm({ offerId, suggestedRs }: { offerId: string; s
           required
           value={rs}
           onChange={(e) => setRs(e.target.value)}
-          className="mt-1 w-40 rounded border border-line bg-surface px-2 py-1"
+          className="field mt-1 !w-44"
         />
       </label>
-      <button type="submit" className="rounded bg-accent px-3 py-1.5 font-medium text-accent-fg">
+      <button type="submit" className="btn btn-primary">
         {t('create')}
       </button>
       <p aria-live="polite" className="text-ink-2">

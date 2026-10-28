@@ -7,7 +7,7 @@ export default function SourceStrip({ sources }: { sources: SourceStatus[] }) {
   const visible = sources.filter((s) => s.status !== 'disabled');
   const off = sources.filter((s) => s.status === 'disabled');
   return (
-    <details className="rounded border border-line bg-surface p-3 text-sm">
+    <details className="card !p-5 text-[15px]">
       <summary className="cursor-pointer text-ink-2">
         {t('sources')}: {visible.filter((s) => s.status === 'ok').length}/{visible.length}
         {visible.some((s) => s.status === 'unavailable') && (
@@ -22,7 +22,7 @@ export default function SourceStrip({ sources }: { sources: SourceStatus[] }) {
       </summary>
       <ul className="mt-2 grid gap-1 sm:grid-cols-2">
         {[...visible, ...off].map((s) => (
-          <li key={s.sourceId} className="flex justify-between gap-2 text-xs">
+          <li key={s.sourceId} className="flex justify-between gap-2 text-[13px]">
             <span className="text-ink">{s.sourceName}</span>
             <span
               className={

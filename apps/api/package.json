@@ -17,6 +17,7 @@
     "@fastify/rate-limit": "11.2.1",
     "@fastify/swagger": "9.9.2",
     "@fastify/swagger-ui": "6.1.2",
+    "@google/genai": "2.31.0",
     "drizzle-orm": "0.45.4",
     "fastify": "5.12.7",
     "fastify-type-provider-zod": "7.0.0",
@@ -29,5 +30,9 @@
     "@types/nodemailer": "8.0.2",
     "@types/supertest": "7.2.1",
     "supertest": "7.3.1"
+  },
+  "exports": {
+    "./app": "./src/app.ts",
+    "./config": "./src/config.ts"
   }
 }

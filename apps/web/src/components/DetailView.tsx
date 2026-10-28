@@ -45,7 +45,7 @@ export default function DetailView({ id }: { id: string }) {
         …
       </p>
     );
-  if (d === 'missing') return <p className="rounded bg-bad-bg p-3 text-bad-fg">{t('notFound')}</p>;
+  if (d === 'missing') return <p className="rounded-[24px] bg-coral-tint p-4">{t('notFound')}</p>;
   const o = d.offer;
   const mine = d.sameItem.find((r) => r.offer.id === o.id) ?? d.sameItem[0];
   const weights = { cost: 0.4, rating: 0.25, speed: 0.2, trust: 0.15 };
@@ -53,16 +53,16 @@ export default function DetailView({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold [overflow-wrap:anywhere]">{displayName(o)}</h1>
-        <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink-2">
+        <h1 className="t-heading [overflow-wrap:anywhere]">{displayName(o)}</h1>
+        <p className="mt-1 flex flex-wrap items-center gap-2 text-[15px] text-ink-2">
           {o.provenance.sourceName} {o.provenance.isSample && <SampleBadge />}{' '}
           <Freshness iso={o.provenance.observedAt} />
         </p>
       </header>
 
       {o.vertical === 'property' && (
-        <section aria-labelledby="facts" className="rounded border border-line bg-surface p-4 text-sm">
-          <h2 id="facts" className="mb-2 font-semibold">
+        <section aria-labelledby="facts" className="card text-[15px]">
+          <h2 id="facts" className="t-heading-sm mb-4">
             {t('property')}
           </h2>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
@@ -81,28 +81,28 @@ export default function DetailView({ id }: { id: string }) {
             <dt className="text-ink-2">{t('transit')}</dt>
             <dd>{o.nearTransit?.join(', ') || '–'}</dd>
           </dl>
-          <p className="mt-3 text-xs text-ink-3">{t('description')}</p>
-          <blockquote className="mt-1 border-l-2 border-line pl-3 text-sm text-ink-2 [overflow-wrap:anywhere]">
+          <p className="mt-3 text-[13px] text-ink-3">{t('description')}</p>
+          <blockquote className="mt-1 border-l-2 border-line pl-3 text-[15px] text-ink-2 [overflow-wrap:anywhere]">
             {o.description}
           </blockquote>
-          <p className="mt-3 text-xs text-ink-3">{t('noContact')}</p>
+          <p className="mt-3 text-[13px] text-ink-3">{t('noContact')}</p>
         </section>
       )}
 
       {o.vertical !== 'property' && (
-        <section aria-labelledby="hist" className="rounded border border-line bg-surface p-4">
+        <section aria-labelledby="hist" className="card">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <h2 id="hist" className="font-semibold">
+            <h2 id="hist" className="font-medium">
               {t('history')}
             </h2>
-            <div role="group" aria-label={t('history')} className="flex gap-1 text-sm">
+            <div role="group" aria-label={t('history')} className="flex gap-1 text-[15px]">
               {([30, 90] as const).map((n) => (
                 <button
                   key={n}
                   type="button"
                   aria-pressed={days === n}
                   onClick={() => setDays(n)}
-                  className={`rounded px-2 py-1 ${days === n ? 'bg-accent text-accent-fg' : 'border border-line'}`}
+                  className="chip"
                 >
                   {n === 30 ? t('days30') : t('days90')}
                 </button>
@@ -115,17 +115,17 @@ export default function DetailView({ id }: { id: string }) {
                 points={hist.points}
                 title={`${t('history')}: ${displayName(o)} (${o.provenance.sourceName})`}
               />
-              <p className="mt-1 text-sm text-ink-2">
+              <p className="mt-1 text-[15px] text-ink-2">
                 {t('lowHigh', { low: inr(hist.minPaise!, locale), high: inr(hist.maxPaise!, locale) })}
                 {hist.points.some((p) => p.isSample) && ` · ${t('historySample')}`}
               </p>
             </>
           ) : (
-            <p className="text-sm text-ink-2">{t('noHistory')}</p>
+            <p className="text-[15px] text-ink-2">{t('noHistory')}</p>
           )}
           {d.mrp && (
             <p
-              className={`mt-2 rounded p-2 text-sm ${d.mrp.inflated ? 'bg-warn-bg text-warn-fg' : 'text-ink-2'}`}
+              className={`mt-2 rounded p-2 text-[15px] ${d.mrp.inflated ? 'bg-warn-bg text-warn-fg' : 'text-ink-2'}`}
             >
               <strong>{t('mrp')}:</strong> {d.mrp.explanation}
             </p>
@@ -134,7 +134,7 @@ export default function DetailView({ id }: { id: string }) {
       )}
 
       <section aria-labelledby="same">
-        <h2 id="same" className="mb-2 font-semibold">
+        <h2 id="same" className="t-heading-sm mb-4">
           {t('sameItem')}
         </h2>
         <ol className="space-y-3">
@@ -150,7 +150,7 @@ export default function DetailView({ id }: { id: string }) {
 
       {d.similar.length > 0 && (
         <section aria-labelledby="sim">
-          <h2 id="sim" className="mb-2 font-semibold">
+          <h2 id="sim" className="t-heading-sm mb-4">
             {t('similar')}
           </h2>
           <ol className="space-y-3">

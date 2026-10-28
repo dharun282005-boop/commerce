@@ -19,8 +19,14 @@ docker compose up --build
 | API + OpenAPI docs     | http://localhost:4100/docs |
 | Alert emails (Mailpit) | http://localhost:8025      |
 
-Optional: put `ANTHROPIC_API_KEY=…` and `ANTHROPIC_MODEL=claude-opus-5-5` in `.env` (or your shell) before
-`docker compose up` to use Claude for the assistant. Without them a rule-based offline assistant is used.
+Assistant model: set `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`) or `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL`
+in `.env` (git-ignored). Without a key, or when the live model is busy, a rule-based offline assistant answers.
+
+Deploy to Vercel: Root Directory `apps/web`, no other settings needed; see
+[docs/deployment-guide.md](docs/deployment-guide.md).
+
+Run just the web app (API built in, sample data, no Docker): `npm run build -w @cuc/web && npm run start -w @cuc/web`
+→ http://localhost:3100.
 
 ## Check it
 
@@ -28,7 +34,7 @@ Optional: put `ANTHROPIC_API_KEY=…` and `ANTHROPIC_MODEL=claude-opus-5-5` in `
 npm run ci                 # lint, type-check, 130+ tests, secrets scan
 npm run test:integration   # Postgres + Redis tests (stack running)
 npm run eval               # 162 assistant scenarios incl. prompt-injection
-npm run e2e                # browser tests: 4 headline stories, a11y, LCP, offline
+npm run e2e                # 42 browser tests: stories, no-errors sweep (EN+TA), a11y, LCP, offline
 ```
 
 ## Status: all phases done (A–G)

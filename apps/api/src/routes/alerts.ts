@@ -7,7 +7,7 @@ import type { Services } from '../services.ts';
 /** Price alerts and "my data" (export / delete). Identity = a signed link sent by email. */
 export async function alertRoutes(
   fastify: FastifyInstance,
-  opts: { alerts: AlertService; services: Services },
+  opts: { alerts: AlertService; services: Services; enabled: boolean },
 ) {
   const app = fastify.withTypeProvider<ZodTypeProvider>();
   const { alerts, services } = opts;
@@ -33,6 +33,12 @@ export async function alertRoutes(
       },
     },
     async (req, reply) => {
+      if (!opts.enabled) {
+        return reply.code(503).send({
+          error: 'alerts_unavailable',
+          message: 'Price alerts are not available on this deployment (no email server configured).',
+        });
+      }
       const [offer] = await services.getOffers([req.body.offerId], req.id);
       if (!offer) return reply.code(404).send({ error: 'not_found', message: 'Unknown offer.' });
       await alerts.create({

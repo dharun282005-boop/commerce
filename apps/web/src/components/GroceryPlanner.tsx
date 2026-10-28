@@ -63,14 +63,14 @@ export default function GroceryPlanner() {
   return (
     <div className="space-y-4">
       <form
-        className="space-y-3 rounded-lg border border-line bg-surface p-4"
+        className="space-y-3 card"
         onSubmit={(e) => {
           e.preventDefault();
           void run(list, locality);
         }}
       >
         <label className="block">
-          <span className="mb-1 block text-sm font-medium">{t('list')}</span>
+          <span className="label">{t('list')}</span>
           <textarea
             value={list}
             onChange={(e) => setList(e.target.value)}
@@ -78,42 +78,40 @@ export default function GroceryPlanner() {
             required
             maxLength={1000}
             placeholder={t('listPlaceholder')}
-            className="w-full rounded border border-line bg-surface px-3 py-2"
+            className="field"
           />
         </label>
         <LocalityInput value={locality} onChange={setLocality} id="g-locality" />
-        <button type="submit" className="rounded bg-accent px-4 py-2 font-medium text-accent-fg">
+        <button type="submit" className="btn btn-primary">
           {t('plan')}
         </button>
       </form>
       <div aria-live="polite" aria-busy={busy}>
         {busy && <p className="text-ink-2">{tr('loading')}</p>}
-        {error && <p className="rounded bg-bad-bg p-3 text-bad-fg">{error}</p>}
+        {error && <p className="rounded-[24px] bg-coral-tint p-4">{error}</p>}
         {plan && p && !busy && (
           <div className="space-y-3">
             {!p.feasible ? (
-              <p className="rounded bg-warn-bg p-3 text-warn-fg">{t('infeasible')}</p>
+              <p className="rounded-[24px] bg-sky-tint p-4">{t('infeasible')}</p>
             ) : (
-              <div className="rounded-lg border border-line bg-surface p-4">
-                <p className="tabular text-2xl font-semibold">
-                  {t('total', { amount: inr(p.totalPaise, locale) })}
-                </p>
+              <div className="card">
+                <p className="tabular t-heading">{t('total', { amount: inr(p.totalPaise, locale) })}</p>
                 {p.bestSinglePlatform && (
-                  <p className="text-sm text-ink-2">
+                  <p className="text-[15px] text-ink-2">
                     {t('single', { amount: inr(p.bestSinglePlatform.totalPaise, locale) })}
                     {p.bestSinglePlatform.totalPaise > p.totalPaise &&
                       ` · ${t('save', { amount: inr(p.bestSinglePlatform.totalPaise - p.totalPaise, locale) })}`}
                   </p>
                 )}
-                {plan.sampleData && <p className="mt-1 text-xs text-sample-fg">{tr('sample')}</p>}
-                <p className="mt-1 text-xs text-ink-3">{t('method', { method: p.method })}</p>
+                {plan.sampleData && <p className="mt-1 text-[13px] text-sample-fg">{tr('sample')}</p>}
+                <p className="mt-1 text-[13px] text-ink-3">{t('method', { method: p.method })}</p>
               </div>
             )}
             <ul className="space-y-3">
               {p.orders.map((o) => (
-                <li key={o.sourceId} className="rounded-lg border border-line bg-surface p-4">
+                <li key={o.sourceId} className="card">
                   <h3 className="font-medium">{o.sourceName}</h3>
-                  <ul className="mt-1 text-sm">
+                  <ul className="mt-1 text-[15px]">
                     {o.lines.map((l) => (
                       <li key={l.offerId} className="flex justify-between gap-2">
                         <span className="[overflow-wrap:anywhere]">
@@ -123,7 +121,7 @@ export default function GroceryPlanner() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-2 text-xs text-ink-2">
+                  <p className="mt-2 text-[13px] text-ink-2">
                     {t('subtotal', { amount: inr(o.subtotalPaise, locale) })} ·{' '}
                     {t('orderFees', { amount: inr(o.feesPaise, locale) })} ·{' '}
                     <strong className="text-ink">{inr(o.totalPaise, locale)}</strong>
@@ -132,7 +130,7 @@ export default function GroceryPlanner() {
               ))}
             </ul>
             {p.unavailable.length > 0 && (
-              <p className="text-sm text-warn-fg">
+              <p className="text-[15px] text-warn-fg">
                 {t('notFound', {
                   items: plan.needs
                     .filter((n) => p.unavailable.includes(n.id))

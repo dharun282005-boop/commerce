@@ -48,7 +48,7 @@ export default function PriceChart({ points, title }: { points: Point[]; title: 
     };
   }, [points]);
 
-  if (!geo) return <p className="text-sm text-ink-2">{t('noHistory')}</p>;
+  if (!geo) return <p className="text-[15px] text-ink-2">{t('noHistory')}</p>;
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString(locale === 'ta' ? 'ta-IN' : 'en-IN', { day: 'numeric', month: 'short' });
   const a = active === null ? null : points[active]!;
@@ -137,19 +137,19 @@ export default function PriceChart({ points, title }: { points: Point[]; title: 
         </svg>
         {a && active !== null && (
           <div
-            className="pointer-events-none absolute top-1 rounded border border-line bg-surface px-2 py-1 text-xs shadow"
+            className="pointer-events-none absolute top-1 rounded-[14px] border-[1.5px] border-ink bg-surface px-3 py-1.5 text-[13px]"
             style={{ left: `clamp(0px, calc(${(geo.x(active) / W) * 100}% - 3.5rem), calc(100% - 7rem))` }}
             role="status"
           >
-            <strong className="tabular block text-sm text-ink">{inr(a.pricePaise, locale)}</strong>
+            <strong className="tabular block text-[15px] text-ink">{inr(a.pricePaise, locale)}</strong>
             <span className="text-ink-2">{fmtDate(a.observedAt)}</span>
           </div>
         )}
       </div>
-      <details className="text-sm">
+      <details className="text-[15px]">
         <summary className="cursor-pointer text-ink-2">Table</summary>
         <div className="max-h-56 overflow-y-auto">
-          <table className="w-full max-w-xs text-xs">
+          <table className="w-full max-w-xs text-[13px]">
             <caption className="sr-only">{title}</caption>
             <tbody>
               {points.map((p) => (

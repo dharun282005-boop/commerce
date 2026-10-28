@@ -4,6 +4,25 @@ Everything runs locally with `docker compose up --build`. This page describes a 
 Provider names, free tiers and prices change often: **[VERIFY each provider's current free tier and terms before
 choosing]**. Nothing has been deployed.
 
+## Option 0: Vercel (web app with the API built in) — simplest
+
+The web app embeds the API at `/api/*`, so one Vercel project runs the whole site on sample data (in-memory: no
+Postgres/Redis; price history is generated sample history; alerts are off unless you add SMTP).
+
+1. Push this repo to GitHub (or GitLab/Bitbucket) and import it in Vercel.
+2. **Root Directory:** `apps/web`. Framework: Next.js (detected). `apps/web/vercel.json` already sets the install
+   command (`npm ci` at the repo root, so workspace packages are installed) and the build command.
+3. **Node.js version:** 24.x (from `apps/web/package.json` `engines`).
+4. **Environment variables** (Project → Settings → Environment Variables), all optional:
+   - `GEMINI_API_KEY` (secret) and `GEMINI_MODEL=gemini-3.8-flash,gemini-flash-latest` for the live assistant;
+   - or `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL` for Claude;
+   - `ALERT_SECRET` (random 32+ chars) and `SMTP_URL` to enable email price alerts.
+   Do **not** set `NEXT_PUBLIC_API_URL` (empty = use the built-in `/api`).
+5. Deploy. Check `https://<your-app>/api/health` → `{"status":"ok",…}`.
+
+Limits on Vercel: rate limits and assistant sessions are per serverless instance (in memory); the assistant's
+streaming works but long Gemini calls count against the function's 60 s limit.
+
 ## Option A: one small VM (simplest, ~₹400–800/month) `[VERIFY prices]`
 
 1. A 1 vCPU / 2 GB Linux VM (any provider, ideally in a Mumbai/Chennai region for latency).

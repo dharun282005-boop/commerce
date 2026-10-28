@@ -12,14 +12,14 @@ export function WhyPanel({ item, weights }: { item: ResultItem; weights: Weights
   const sum = weights.cost + weights.rating + weights.speed + weights.trust;
   const keys = ['cost', 'rating', 'speed', 'trust'] as const;
   return (
-    <details className="mt-2 text-sm">
-      <summary className="cursor-pointer text-accent">{t('why', { rank: item.rank })}</summary>
+    <details className="mt-2 text-[15px]">
+      <summary className="cursor-pointer font-medium text-ink">{t('why', { rank: item.rank })}</summary>
       <div className="mt-2 space-y-1.5">
         <p className="text-ink-2">
           {t('score')}: <strong className="tabular text-ink">{item.score.toFixed(3)}</strong>
         </p>
         {keys.map((k) => (
-          <div key={k} className="grid grid-cols-[7.5rem_1fr_3.5rem] items-center gap-2 text-xs">
+          <div key={k} className="grid grid-cols-[7.5rem_1fr_3.5rem] items-center gap-2 text-[13px]">
             <span className="text-ink-2">{t(`components.${k}`)}</span>
             <span className="h-2 rounded bg-surface-2" aria-hidden="true">
               <span
@@ -34,7 +34,7 @@ export function WhyPanel({ item, weights }: { item: ResultItem; weights: Weights
           </div>
         ))}
         {item.notes.length > 0 && (
-          <ul className="list-disc pl-5 text-xs text-ink-2">
+          <ul className="list-disc pl-5 text-[13px] text-ink-2">
             {item.notes.map((n) => (
               <li key={n}>{n}</li>
             ))}
@@ -62,29 +62,34 @@ export default function OfferCard({ item, weights }: { item: ResultItem; weights
   const share = `https://wa.me/?text=${encodeURIComponent(`${displayName(o)}: ${inr(item.landed.totalPaise, 'en')}${perMonth ? '/month' : ''} on ${o.provenance.sourceName}${o.provenance.isSample ? ' (sample data)' : ''} – compared on Chennai Universal Commerce`)}`;
 
   return (
-    <article className="rounded-lg border border-line bg-surface p-4" aria-labelledby={`t-${o.id}`}>
+    <article className="card" aria-labelledby={`t-${o.id}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-ink-3">#{item.rank}</p>
-          <h3 id={`t-${o.id}`} className="font-medium text-ink [overflow-wrap:anywhere]">
+          <p className="mb-1">
+            <span className="tag">#{item.rank}</span>
+          </p>
+          <h3
+            id={`t-${o.id}`}
+            className="text-[20px] font-medium leading-snug text-ink [overflow-wrap:anywhere]"
+          >
             {name}
           </h3>
-          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-2">
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-ink-2">
             <span>{o.provenance.sourceName}</span>
             {o.provenance.isSample && <SampleBadge />}
             {o.provenance.confidence < 1 && o.provenance.tier === 3 && (
-              <span className="text-xs">{t('userReported')}</span>
+              <span className="text-[13px]">{t('userReported')}</span>
             )}
             <Freshness iso={o.provenance.observedAt} />
-            {o.affiliate && <span className="text-xs">({t('affiliate')})</span>}
+            {o.affiliate && <span className="text-[13px]">({t('affiliate')})</span>}
           </p>
         </div>
         <div className="text-right">
-          <p className="tabular text-xl font-semibold text-ink">
+          <p className="tabular text-[30px] font-medium leading-tight tracking-[-0.02em] text-ink">
             {inr(item.landed.totalPaise, locale)}
-            {perMonth && <span className="text-sm font-normal text-ink-2">{t('perMonth')}</span>}
+            {perMonth && <span className="text-[15px] font-normal text-ink-2">{t('perMonth')}</span>}
           </p>
-          <p className="text-xs text-ink-3">
+          <p className="text-[13px] text-ink-3">
             {o.vertical === 'property'
               ? ''
               : `${t('total')} · ${t('item')} ${inr(item.landed.itemPaise, locale)}`}
@@ -93,7 +98,7 @@ export default function OfferCard({ item, weights }: { item: ResultItem; weights
         </div>
       </div>
 
-      <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-2">
+      <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px] text-ink-2">
         {o.etaMinutes !== null && (
           <div>
             <dt className="sr-only">ETA</dt>
@@ -150,12 +155,12 @@ export default function OfferCard({ item, weights }: { item: ResultItem; weights
         )}
       </dl>
       {item.alsoListedOn && item.alsoListedOn.length > 0 && (
-        <p className="mt-1 text-sm text-ink-2">
+        <p className="mt-1 text-[15px] text-ink-2">
           {t('alsoListedOn', { sources: item.alsoListedOn.map((a) => a.sourceName).join(', ') })}
         </p>
       )}
       {item.landed.possibleSavingsPaise > 0 && (
-        <p className="mt-1 text-xs text-ink-2">
+        <p className="mt-1 text-[13px] text-ink-2">
           {t('possibleSavings', { amount: inr(item.landed.possibleSavingsPaise, locale) })}
         </p>
       )}
@@ -163,9 +168,9 @@ export default function OfferCard({ item, weights }: { item: ResultItem; weights
       <Flags flags={item.flags} />
 
       {o.vertical !== 'property' && item.landed.lines.length > 1 && (
-        <details className="mt-2 text-sm">
+        <details className="mt-2 text-[15px]">
           <summary className="cursor-pointer text-ink-2">{t('total')}</summary>
-          <table className="mt-1 w-full max-w-xs text-xs">
+          <table className="mt-1 w-full max-w-xs text-[13px]">
             <tbody>
               {item.landed.lines.map((l) => (
                 <tr key={l.label}>
@@ -179,7 +184,7 @@ export default function OfferCard({ item, weights }: { item: ResultItem; weights
                 <th scope="row" className="py-0.5 text-left">
                   {t('total')}
                 </th>
-                <td className="tabular text-right font-semibold">{inr(item.landed.totalPaise, locale)}</td>
+                <td className="tabular text-right font-medium">{inr(item.landed.totalPaise, locale)}</td>
               </tr>
             </tbody>
           </table>
@@ -188,16 +193,12 @@ export default function OfferCard({ item, weights }: { item: ResultItem; weights
 
       <WhyPanel item={item} weights={weights} />
 
-      <div className="mt-3 flex flex-wrap gap-2 text-sm">
-        <a
-          href={o.url}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-          className="rounded bg-accent px-3 py-1.5 font-medium text-accent-fg"
-        >
+      <div className="mt-3 flex flex-wrap gap-2 text-[15px]">
+        <a href={o.url} target="_blank" rel="noopener noreferrer nofollow" className="btn btn-primary">
           {t('open', { source: o.provenance.sourceName.replace(' (sample)', '') })}
+          <span className="dot dot-white" aria-hidden="true" />
         </a>
-        <Link href={detailHref} className="rounded border border-line px-3 py-1.5 text-ink">
+        <Link href={detailHref} prefetch={false} className="btn btn-ghost">
           {t('details')}
         </Link>
         <button
@@ -219,20 +220,15 @@ export default function OfferCard({ item, weights }: { item: ResultItem; weights
               });
             setSaved(!saved);
           }}
-          className="rounded border border-line px-3 py-1.5 text-ink"
+          className="btn btn-ghost"
         >
           {saved ? t('saved') : t('save')}
         </button>
-        <a
-          href={share}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded border border-line px-3 py-1.5 text-ink"
-        >
+        <a href={share} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
           {t('share')}
         </a>
       </div>
-      {o.vertical === 'property' && <p className="mt-2 text-xs text-ink-3">{td('noContact')}</p>}
+      {o.vertical === 'property' && <p className="mt-2 text-[13px] text-ink-3">{td('noContact')}</p>}
     </article>
   );
 }

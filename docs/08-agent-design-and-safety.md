@@ -9,7 +9,17 @@ Built in Phase E (`apps/api/src/agent/`). Eval report: [phase-E-eval.md](progres
 | `ClaudeModel` | `ANTHROPIC_MODEL` **and** credentials are set | `client.beta.messages.stream(...)` with the static system prompt and tool list cached (`cache_control` on the system block and the last tool), `output_config.effort` from `AGENT_EFFORT` (default `medium`), adaptive thinking (default on current models), and server-side refusal fallback `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`; runs the model alone where unsupported). `refusal` stop reasons are handled. |
 | `ScriptedModel` (offline planner) | otherwise | Rule-based request parsing, same tools, same loop, same grounding. No API calls. It is not a language model and only understands common phrasings. |
 
+| `GeminiModel` | `GEMINI_API_KEY` set (and Claude not configured, or `AGENT_PROVIDER=gemini`) | `@google/genai` 2.31.0 `models.generateContentStream` with the system instruction, the same nine tools as `functionDeclarations` (`parametersJsonSchema`), `maxOutputTokens`; function results go back as `functionResponse` parts and `thoughtSignature`s are preserved. `GEMINI_MODEL` may list several models, tried in order on 404/429/500/503/504; 15 s timeout per call. Docs: googleapis.github.io/js-genai. |
+
+Live models are wrapped in `ResilientModel`: if a call fails, the offline planner answers that turn (the reply's
+`model` says so and the UI shows a note) and the live model is skipped for 60 s.
+
 `GET /v1/agent/status` says which one is running.
+
+**Gemini status at setup (2026-10-29):** the key is valid and lists models, but every generation call failed on
+Google's side: `gemini-3.8-flash` 503 "high demand", `gemini-flash-latest` 504, a 429 free-tier quota error, and
+older models 404 "no longer available to new users". So live Gemini answers have not been observed yet; the
+adapter is covered by unit tests with a fake SDK, and the site falls back automatically.
 
 ## Model and API
 

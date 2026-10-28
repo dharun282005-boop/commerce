@@ -31,6 +31,7 @@ interface Msg {
   tools?: ToolLine[];
   grounded?: boolean;
   done?: boolean;
+  model?: string;
 }
 interface Prefs {
   locality?: string;
@@ -47,7 +48,7 @@ export default function Chat({ compact = false }: { compact?: boolean }) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState<{ live: boolean } | null>(null);
+  const [status, setStatus] = useState<{ live: boolean; model: string } | null>(null);
   const [consent, setConsent] = useState(false);
   const [prefs, setPrefs] = useState<Prefs>({});
   const session = useRef<string | null>(null);
@@ -142,48 +143,55 @@ export default function Chat({ compact = false }: { compact?: boolean }) {
 
   return (
     <div className={`flex flex-col gap-3 ${compact ? 'h-full' : ''}`}>
-      {status && <p className="text-xs text-ink-3">{status.live ? t('live') : t('offline')}</p>}
+      {status && (
+        <p className="text-[13px] text-ink-3">
+          {status.live ? t('live', { model: status.model }) : t('offline')}
+        </p>
+      )}
       <div
         className={`space-y-3 overflow-y-auto ${compact ? 'flex-1' : 'min-h-48'}`}
         aria-live="polite"
         aria-busy={busy}
       >
-        {msgs.length === 0 && <p className="text-sm text-ink-2">{t('intro')}</p>}
+        {msgs.length === 0 && <p className="text-[15px] text-ink-2">{t('intro')}</p>}
         {msgs.map((m, i) =>
           m.role === 'user' ? (
             <p
               key={i}
-              className="ml-auto max-w-[85%] rounded-lg bg-accent px-3 py-2 text-sm text-accent-fg [overflow-wrap:anywhere]"
+              className="ml-auto max-w-[85%] rounded-[22px] bg-grass px-4 py-2.5 text-[15px] text-accent-fg [overflow-wrap:anywhere]"
             >
               {m.text}
             </p>
           ) : (
-            <div key={i} className="max-w-full rounded-lg border border-line bg-surface p-3 text-sm">
+            <div key={i} className="max-w-full card !p-5 text-[15px]">
               {!m.done && !m.text && <p className="text-ink-2">{t('thinking')}</p>}
               <p className="whitespace-pre-wrap text-ink [overflow-wrap:anywhere]">
                 {m.text.replace(/```json[\s\S]*$/, '').trim()}
               </p>
+              {m.model?.includes('unavailable') && (
+                <p className="mt-2 rounded-[14px] bg-sky-tint px-3 py-2 text-[13px]">{t('fallback')}</p>
+              )}
               {m.grounded === false && (
-                <p className="mt-2 rounded bg-warn-bg p-2 text-xs text-warn-fg">{t('ungrounded')}</p>
+                <p className="mt-2 rounded bg-warn-bg p-2 text-[13px] text-warn-fg">{t('ungrounded')}</p>
               )}
               {m.cards && m.cards.length > 0 && (
                 <ul className="mt-3 space-y-2">
                   {m.cards.map((c) => (
-                    <li key={c.offerId} className="rounded border border-line p-2">
+                    <li key={c.offerId} className="inset">
                       <p className="font-medium [overflow-wrap:anywhere]">{c.title}</p>
-                      <p className="flex flex-wrap items-center gap-2 text-xs text-ink-2">
-                        <strong className="tabular text-sm text-ink">
+                      <p className="flex flex-wrap items-center gap-2 text-[13px] text-ink-2">
+                        <strong className="tabular text-[15px] text-ink">
                           {inr(Math.round(c.landedRs * 100), locale)}
                         </strong>
                         {c.sourceName} {c.isSample && <SampleBadge />} <Freshness iso={c.observedAt} />
                       </p>
-                      {c.why && <p className="text-xs text-ink-2">{c.why}</p>}
+                      {c.why && <p className="text-[13px] text-ink-2">{c.why}</p>}
                       <Flags flags={c.flags} />
                       <a
                         href={c.url}
                         target="_blank"
                         rel="noopener noreferrer nofollow"
-                        className="text-xs text-accent underline"
+                        className="link text-[13px]"
                       >
                         {c.sourceName.replace(' (sample)', '')} ↗
                       </a>
@@ -192,7 +200,7 @@ export default function Chat({ compact = false }: { compact?: boolean }) {
                 </ul>
               )}
               {m.tools && m.tools.length > 0 && (
-                <details className="mt-2 text-xs text-ink-2">
+                <details className="mt-2 text-[13px] text-ink-2">
                   <summary className="cursor-pointer">
                     {t('checked')} ({m.tools.length})
                   </summary>
@@ -227,17 +235,13 @@ export default function Chat({ compact = false }: { compact?: boolean }) {
           onChange={(e) => setInput(e.target.value)}
           placeholder={t('placeholder')}
           maxLength={2000}
-          className="min-w-0 flex-1 rounded border border-line bg-surface px-3 py-2 text-ink"
+          className="field min-w-0 flex-1 !rounded-full"
         />
-        <button
-          type="submit"
-          disabled={busy}
-          className="rounded bg-accent px-4 py-2 font-medium text-accent-fg disabled:opacity-60"
-        >
+        <button type="submit" disabled={busy} className="btn btn-primary">
           {t('send')}
         </button>
       </form>
-      <div className="flex flex-wrap items-center gap-3 text-xs text-ink-2">
+      <div className="flex flex-wrap items-center gap-3 text-[13px] text-ink-2">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -268,7 +272,7 @@ export default function Chat({ compact = false }: { compact?: boolean }) {
         </button>
       </div>
       {consent && (
-        <div className="flex flex-wrap gap-2 text-xs">
+        <div className="flex flex-wrap gap-2 text-[13px]">
           <input
             aria-label="Locality"
             placeholder="Locality"
@@ -278,7 +282,7 @@ export default function Chat({ compact = false }: { compact?: boolean }) {
               setPrefs(p);
               setLocal(PREFS_KEY, JSON.stringify(p));
             }}
-            className="w-28 rounded border border-line bg-surface px-2 py-1"
+            className="field !w-28 !py-1.5 !text-[15px]"
           />
           <input
             aria-label="Budget ₹"
@@ -290,7 +294,7 @@ export default function Chat({ compact = false }: { compact?: boolean }) {
               setPrefs(p);
               setLocal(PREFS_KEY, JSON.stringify(p));
             }}
-            className="w-24 rounded border border-line bg-surface px-2 py-1"
+            className="field !w-24 !py-1.5 !text-[15px]"
           />
           <label className="flex items-center gap-1">
             <input

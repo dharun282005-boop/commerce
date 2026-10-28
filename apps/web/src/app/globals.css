@@ -1,70 +1,80 @@
 @import 'tailwindcss';
 
-/* Design tokens. Light by default; dark from the system setting. Chart tokens follow the
-   dataviz reference palette (series-1 blue), validated for both surfaces. */
+/*
+ * Design system: "cream paper storybook" (MindMarket-style reference).
+ * Cream canvas, white sticker-soft cards, Inter everywhere, one green structural accent,
+ * coral for the main action, yellow closing band. Flat: no shadows or gradients.
+ *
+ * Accessibility adjustments to the reference (WCAG 2.2 AA):
+ *  - muted text uses #5c5e5a (5.8:1 on cream) instead of Stone Gray #80827f (3.4:1);
+ *  - coral buttons carry ink text (5.1:1) instead of white (2.7:1);
+ *  - green never carries text or focus rings (1.6:1 on cream); focus rings are ink.
+ */
 :root {
-  --bg: #f6f6f4;
-  --surface: #fcfcfb;
-  --surface-2: #f0efec;
-  --border: #dddcd7;
-  --text: #0b0b0b;
-  --text-2: #52514e;
-  --text-3: #6b6a65;
-  --accent: #1c5cab;
-  --accent-fg: #ffffff;
+  --color-fresh-grass: #8ed462;
+  --color-cream-paper: #f5f1e4;
+  --color-ink-black: #2c2e2a;
+  --color-pure-white: #ffffff;
+  --color-sandstone: #e0dbce;
+  --color-stone-gray: #80827f;
+  --color-hairline-mist: #d5d5d4;
+  --color-sky-pop: #2ba0ff;
+  --color-coral-pop: #ff705d;
+  --color-sunshine-pop: #f5e211;
+  --color-ink-muted: #5c5e5a;
+  --color-coral-tint: #ffe8e3;
+  --color-grass-tint: #e6f5da;
+  --color-sky-tint: #e3f1ff;
+
+  /* Semantic aliases used by components */
+  --bg: var(--color-cream-paper);
+  --surface: var(--color-pure-white);
+  --surface-2: var(--color-sandstone);
+  --border: var(--color-hairline-mist);
+  --text: var(--color-ink-black);
+  --text-2: var(--color-ink-muted);
+  --text-3: var(--color-ink-muted);
   --series-1: #2a78d6;
-  --grid: #e6e5e0;
-  --warn-bg: #fff4d6;
-  --warn-fg: #6b4500;
-  --bad-bg: #fde8e8;
-  --bad-fg: #8a1c1c;
-  --ok-fg: #0a6b0a;
-  --sample-bg: #e8f0fb;
-  --sample-fg: #134479;
+  --grid: #e7e3d6;
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121211;
-    --surface: #1a1a19;
-    --surface-2: #242422;
-    --border: #383835;
-    --text: #f0efec;
-    --text-2: #c3c2b7;
-    --text-3: #a3a29a;
-    --accent: #86b6ef;
-    --accent-fg: #0b0b0b;
-    --series-1: #3987e5;
-    --grid: #2c2c2a;
-    --warn-bg: #3a2c05;
-    --warn-fg: #f6d58a;
-    --bad-bg: #3d1414;
-    --bad-fg: #f5b3b3;
-    --ok-fg: #7ad67a;
-    --sample-bg: #16263b;
-    --sample-fg: #b7d3f6;
-    color-scheme: dark;
-  }
-}
-
 @theme inline {
+  --font-sans:
+    var(--font-inter), var(--font-tamil), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-line: var(--border);
+  --color-field: var(--color-stone-gray);
   --color-ink: var(--text);
   --color-ink-2: var(--text-2);
   --color-ink-3: var(--text-3);
-  --color-accent: var(--accent);
-  --color-accent-fg: var(--accent-fg);
-  --color-warn-bg: var(--warn-bg);
-  --color-warn-fg: var(--warn-fg);
-  --color-bad-bg: var(--bad-bg);
-  --color-bad-fg: var(--bad-fg);
-  --color-ok: var(--ok-fg);
-  --color-sample-bg: var(--sample-bg);
-  --color-sample-fg: var(--sample-fg);
+  --color-grass: var(--color-fresh-grass);
+  --color-grass-tint: var(--color-grass-tint);
+  --color-coral: var(--color-coral-pop);
+  --color-coral-tint: var(--color-coral-tint);
+  --color-sky: var(--color-sky-pop);
+  --color-sky-tint: var(--color-sky-tint);
+  --color-sun: var(--color-sunshine-pop);
+  --color-sand: var(--color-sandstone);
+
+  /* Legacy names kept so every component maps onto the new palette */
+  --color-accent: var(--color-fresh-grass);
+  --color-accent-fg: var(--color-ink-black);
+  --color-warn-bg: var(--color-sky-tint);
+  --color-warn-fg: var(--color-ink-black);
+  --color-bad-bg: var(--color-coral-tint);
+  --color-bad-fg: var(--color-ink-black);
+  --color-ok: #3f6d1f;
+  --color-sample-bg: var(--color-sandstone);
+  --color-sample-fg: var(--color-ink-black);
+
+  --radius-pill: 50px;
+  --radius-card: 32px;
+  --radius-sheet: 50px;
+  --radius-art: 63.75px;
 }
 
 html {
@@ -74,23 +84,223 @@ html {
 }
 body {
   background: var(--bg);
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    'Noto Sans Tamil',
-    'Noto Sans',
-    sans-serif;
+  font-family: var(--font-sans);
+  font-size: 17px;
   line-height: 1.5;
 }
 :lang(ta) body {
   line-height: 1.7;
 }
 :focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-ink-black);
+  outline-offset: 3px;
+}
+::selection {
+  background: var(--color-fresh-grass);
+  color: var(--color-ink-black);
+}
+a {
+  text-underline-offset: 3px;
 }
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  /* Type scale */
+  .t-display {
+    font-weight: 500;
+    font-size: clamp(3rem, 11vw, 8.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+  }
+  .t-heading {
+    font-weight: 500;
+    font-size: clamp(2.25rem, 6.5vw, 3.3rem);
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+  }
+  .t-heading-sm {
+    font-weight: 500;
+    font-size: clamp(1.5rem, 3.5vw, 1.875rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  :lang(ta) .t-display,
+  :lang(ta) .t-heading {
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  /* Tamil words are long: a smaller display size keeps them inside narrow screens. */
+  :lang(ta) .t-display {
+    font-size: clamp(2.25rem, 8.5vw, 6rem);
+  }
+
+  /* Surfaces */
+  .card {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-card);
+    padding: 1.5rem;
+  }
+  @media (min-width: 640px) {
+    .card {
+      padding: 1.75rem;
+    }
+  }
+  .sheet {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-sheet);
+    padding: 1.75rem;
+  }
+  @media (min-width: 640px) {
+    .sheet {
+      padding: 2.5rem;
+    }
+  }
+  .inset {
+    background: var(--color-cream-paper);
+    border-radius: 24px;
+    padding: 1rem 1.25rem;
+  }
+
+  /* Buttons: pill-shaped, flat, one chromatic accent each */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-radius: var(--radius-pill);
+    padding: 0.7rem 1.25rem;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--color-ink-black);
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 0.15s ease,
+      transform 0.1s ease;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn:disabled {
+    opacity: 0.6;
+  }
+  .btn-primary {
+    background: var(--color-coral-pop);
+  }
+  .btn-primary:hover {
+    background: #ff8574;
+  }
+  .btn-ghost {
+    background: var(--color-pure-white);
+    box-shadow: inset 0 0 0 1.5px var(--color-ink-black);
+  }
+  .btn-ghost:hover {
+    background: var(--color-cream-paper);
+  }
+  .btn-soft {
+    background: var(--color-cream-paper);
+  }
+  .btn-soft:hover {
+    background: var(--color-sandstone);
+  }
+  /* The small chromatic circle that marks an action */
+  .dot {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 9999px;
+    flex: none;
+  }
+  .dot-sky {
+    background: var(--color-sky-pop);
+  }
+  .dot-grass {
+    background: var(--color-fresh-grass);
+  }
+  .dot-white {
+    background: var(--color-pure-white);
+  }
+  .dot-coral {
+    background: var(--color-coral-pop);
+  }
+
+  /* Chips: selectable pills (tabs, presets). Selected = green fill, ink text. */
+  .chip {
+    border-radius: var(--radius-pill);
+    padding: 0.5rem 1rem;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--color-pure-white);
+    color: var(--color-ink-black);
+    box-shadow: inset 0 0 0 1.5px var(--color-stone-gray);
+  }
+  .chip[aria-pressed='true'],
+  .chip[aria-selected='true'] {
+    background: var(--color-fresh-grass);
+    box-shadow: inset 0 0 0 1.5px var(--color-ink-black);
+  }
+
+  /* Form fields */
+  .field {
+    width: 100%;
+    background: var(--color-pure-white);
+    border: 1.5px solid var(--color-stone-gray);
+    border-radius: 18px;
+    padding: 0.75rem 1rem;
+    color: var(--color-ink-black);
+    font-size: 17px;
+  }
+  .field::placeholder {
+    color: var(--color-ink-muted);
+  }
+  .field:focus {
+    border-color: var(--color-ink-black);
+  }
+  .label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  /* Small tags */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 10px;
+    padding: 0.15rem 0.55rem;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--color-sandstone);
+    color: var(--color-ink-black);
+  }
+
+  .link {
+    color: var(--color-ink-black);
+    text-decoration: underline;
+    text-decoration-color: var(--color-stone-gray);
+  }
+  .link:hover {
+    text-decoration-color: var(--color-ink-black);
+  }
+
+  details > summary {
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+  details > summary::before {
+    content: '+';
+    display: inline-block;
+    width: 1.1rem;
+    font-weight: 500;
+  }
+  details[open] > summary::before {
+    content: '−';
+  }
 }

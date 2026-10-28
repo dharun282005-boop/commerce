@@ -3,26 +3,40 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { usePathname, useRouter } from '@/i18n/navigation';
 
+/** Two small pills: EN / தமிழ். */
 export default function LanguageSwitch() {
   const locale = useLocale();
   const t = useTranslations('app');
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const go = (l: string) => {
+    const qs = params.toString();
+    router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { locale: l });
+  };
   return (
-    <label className="flex items-center gap-2 text-sm text-ink-2">
-      <span className="sr-only">{t('language')}</span>
-      <select
-        value={locale}
-        onChange={(e) => {
-          const qs = params.toString();
-          router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { locale: e.target.value });
-        }}
-        className="rounded border border-line bg-surface px-2 py-1 text-ink"
-      >
-        <option value="en">English</option>
-        <option value="ta">தமிழ்</option>
-      </select>
-    </label>
+    <div
+      role="group"
+      aria-label={t('language')}
+      className="flex rounded-full bg-bg p-1 text-[13px] font-medium"
+    >
+      {(
+        [
+          ['en', 'EN'],
+          ['ta', 'தமிழ்'],
+        ] as const
+      ).map(([l, label]) => (
+        <button
+          key={l}
+          type="button"
+          lang={l}
+          aria-pressed={locale === l}
+          onClick={() => go(l)}
+          className={`rounded-full px-3 py-1.5 ${locale === l ? 'bg-surface' : ''}`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
   );
 }

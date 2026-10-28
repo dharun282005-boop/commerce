@@ -23,7 +23,7 @@ export default function LocalityInput({
   }, []);
   return (
     <div>
-      <label htmlFor={id} className="mb-1 block text-sm font-medium text-ink">
+      <label htmlFor={id} className="label">
         {t('locality')}
       </label>
       <input
@@ -34,7 +34,7 @@ export default function LocalityInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t('localityPlaceholder')}
-        className="w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+        className="field"
       />
       <datalist id={`${id}-list`}>
         <option value="OMR" />

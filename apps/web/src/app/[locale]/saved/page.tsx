@@ -14,7 +14,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const t = await getTranslations();
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">{t('saved.title')}</h1>
+      <h1 className="t-heading">{t('saved.title')}</h1>
       <Suspense fallback={<p className="text-ink-2">…</p>}>
         <SavedView />
       </Suspense>

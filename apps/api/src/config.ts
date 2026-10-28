@@ -40,6 +40,8 @@ const Env = z.object({
     .transform((v) => v || undefined),
   WEB_ORIGIN: z.string().default('http://localhost:3100'),
   RATE_LIMIT: z.enum(['on', 'off']).default('on'),
+  /** Swagger UI at /docs (off in serverless, where its static files are not available). */
+  DOCS: z.enum(['on', 'off']).default('on'),
   /** Requests per minute per IP for ordinary routes (stricter limits apply to agent, submissions and alerts). */
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
   /** Set to "true" behind a reverse proxy so the client IP comes from X-Forwarded-For. */

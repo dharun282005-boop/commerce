@@ -39,10 +39,7 @@ export default function SavedView() {
         ) : (
           <ul className="space-y-2">
             {items.map((s) => (
-              <li
-                key={s.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded border border-line bg-surface p-3"
-              >
+              <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 card !p-5">
                 <div className="min-w-0">
                   <a
                     href={s.url}
@@ -52,16 +49,12 @@ export default function SavedView() {
                   >
                     {s.title}
                   </a>
-                  <p className="flex flex-wrap items-center gap-2 text-xs text-ink-2">
-                    <strong className="tabular text-sm text-ink">{inr(s.totalPaise, locale)}</strong>{' '}
+                  <p className="flex flex-wrap items-center gap-2 text-[13px] text-ink-2">
+                    <strong className="tabular text-[15px] text-ink">{inr(s.totalPaise, locale)}</strong>{' '}
                     {s.sourceName} {s.isSample && <SampleBadge />} <Freshness iso={s.observedAt} />
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeSaved(s.id)}
-                  className="rounded border border-line px-3 py-1 text-sm"
-                >
+                <button type="button" onClick={() => removeSaved(s.id)} className="btn btn-ghost !py-2">
                   {t('remove')}
                 </button>
               </li>
@@ -69,8 +62,8 @@ export default function SavedView() {
           </ul>
         )}
       </section>
-      <section aria-labelledby="mydata" className="rounded border border-line bg-surface p-4 text-sm">
-        <h2 id="mydata" className="mb-2 font-semibold">
+      <section aria-labelledby="mydata" className="card text-[15px]">
+        <h2 id="mydata" className="t-heading-sm mb-4">
           {t('alerts')}
         </h2>
         {!access ? (
@@ -87,7 +80,7 @@ export default function SavedView() {
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                className="rounded border border-line px-3 py-1"
+                className="btn btn-ghost !py-2"
                 onClick={async () => {
                   const data = await api('/v1/me', { headers: { authorization: `Bearer ${access}` } });
                   const url = URL.createObjectURL(
@@ -104,7 +97,7 @@ export default function SavedView() {
               </button>
               <button
                 type="button"
-                className="rounded bg-bad-bg px-3 py-1 text-bad-fg"
+                className="btn bg-coral-tint !py-2"
                 onClick={async () => {
                   await api('/v1/me', { method: 'DELETE', headers: { authorization: `Bearer ${access}` } });
                   setLocal(ACCESS_KEY, null);

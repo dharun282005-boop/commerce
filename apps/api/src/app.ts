@@ -41,7 +41,7 @@ import { alertRoutes } from './routes/alerts.ts';
 import { coreRoutes } from './routes/core.ts';
 import { dataRoutes } from './routes/data.ts';
 import { agentRoutes } from './routes/agent.ts';
-import { claudeFromEnv, type AgentModel } from './agent/models.ts';
+import { agentModelFromEnv, ResilientModel, type AgentModel } from './agent/models.ts';
 import { ScriptedModel } from './agent/scripted.ts';
 import type { AgentLimits } from './agent/loop.ts';
 import { createServices, type Services } from './services.ts';
@@ -176,7 +176,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     },
     transform: jsonSchemaTransform,
   });
-  await app.register(fastifySwaggerUI, { routePrefix: '/docs' });
+  if (config.DOCS === 'on') await app.register(fastifySwaggerUI, { routePrefix: '/docs' });
 
   const policy = policyFromEnv(config);
   const cache = deps.cache ?? new MemoryCache();
@@ -286,8 +286,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   await app.register(coreRoutes, { services, metrics });
   await app.register(dataRoutes, { importer, userSubmitted, config, now, metrics });
-  await app.register(alertRoutes, { alerts, services });
-  const agentModel = deps.agentModel ?? claudeFromEnv() ?? new ScriptedModel();
+  // Alerts need a way to send email: SMTP in deployments, or an injected notifier in tests.
+  await app.register(alertRoutes, { alerts, services, enabled: Boolean(deps.notifier || config.SMTP_URL) });
+  const liveModel = deps.agentModel ? null : await agentModelFromEnv();
+  const agentModel =
+    deps.agentModel ?? (liveModel ? new ResilientModel(liveModel, new ScriptedModel()) : new ScriptedModel());
   await app.register(agentRoutes, { services, metrics, model: agentModel, now, limits: deps.agentLimits });
   for (const plugin of deps.plugins ?? []) await plugin(app, { services, metrics });
 

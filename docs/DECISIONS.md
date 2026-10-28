@@ -20,3 +20,8 @@
 | 2026-10-29 | Strict per-source rate limits only for real sources | Sample/local sources starved under eval load | One limit for all |
 | 2026-10-29 | Alerts identity = signed email link (no passwords, no cookies) | Minimal personal data; no CSRF surface | OAuth / password accounts |
 | 2026-10-29 | API port 4100, web 3100 | Port 4000 was in use on the owner's Mac | — |
+| 2026-10-29 | Gemini (Google Gen AI SDK 2.31.0) added as an assistant model; provider chosen by `AGENT_PROVIDER` (auto: Claude, else Gemini, else offline) | Owner supplied a Gemini key | Replacing Claude support |
+| 2026-10-29 | `ResilientModel`: when the live model fails (overload, quota, timeout) the offline planner answers and the model is skipped for 60 s | Gemini returned 503/504/429 during setup; the site must not break | Show an error to the user |
+| 2026-10-29 | API embedded in the web app at `/api/*` (Fastify via `inject`, streamed) | One Vercel deployment serves everything; same tested code | Separate API host (still supported via `NEXT_PUBLIC_API_URL`) |
+| 2026-10-29 | Visual design: cream-paper storybook system (owner-provided reference) | Owner request | Previous neutral design |
+| 2026-10-29 | Design deviations for WCAG AA: muted text #5c5e5a (not Stone Gray), ink text on coral (not white), green never as text/focus, Tamil display size reduced on narrow screens, headings below 53px on phones | Contrast and fit | Following the reference literally |

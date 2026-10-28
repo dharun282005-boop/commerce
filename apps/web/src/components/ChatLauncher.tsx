@@ -12,7 +12,7 @@ export default function ChatLauncher() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-4 right-4 z-30 rounded-full bg-accent px-4 py-3 font-medium text-accent-fg shadow-lg"
+        className="btn btn-primary fixed bottom-4 right-4 z-30"
       >
         💬 {t('open')}
       </button>
@@ -25,18 +25,13 @@ export default function ChatLauncher() {
           onClick={() => setOpen(false)}
         >
           <div
-            className="flex h-full w-full max-w-md flex-col bg-bg p-4 shadow-xl"
+            className="flex h-full w-full max-w-md flex-col rounded-l-[32px] bg-bg p-5"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}
           >
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="font-semibold">{t('title')}</h2>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="rounded border border-line px-2 py-1 text-sm"
-                autoFocus
-              >
+              <h2 className="font-medium">{t('title')}</h2>
+              <button type="button" onClick={() => setOpen(false)} className="btn btn-ghost !py-2" autoFocus>
                 {t('close')}
               </button>
             </div>

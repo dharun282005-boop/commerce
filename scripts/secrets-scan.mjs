@@ -9,6 +9,7 @@ const PATTERNS = [
   ['AWS access key', /\bAKIA[0-9A-Z]{16}\b/],
   ['Private key block', /-----BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY-----/],
   ['Google API key', /\bAIza[0-9A-Za-z_-]{35}\b/],
+  ['Google auth key (AQ.)', /\bAQ\.[A-Za-z0-9_-]{20,}/],
   ['GitHub token', /\bgh[pousr]_[A-Za-z0-9]{36,}\b/],
   ['Slack token', /\bxox[abpr]-[A-Za-z0-9-]{10,}\b/],
   [

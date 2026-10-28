@@ -20,16 +20,16 @@ export default async function About({ params }: { params: Promise<{ locale: stri
   } as const;
   return (
     <article className="max-w-prose space-y-5">
-      <h1 className="text-2xl font-semibold">{t('title')}</h1>
+      <h1 className="t-heading">{t('title')}</h1>
       <p>{t('p1')}</p>
       {sections.map((s) => (
         <section key={s}>
-          <h2 className="mb-1 font-semibold">{t(`${s}Title`)}</h2>
+          <h2 className="mb-1 font-medium">{t(`${s}Title`)}</h2>
           <p className="text-ink-2">{t(body[s])}</p>
         </section>
       ))}
       <p>
-        <Link href="/admin/sources" className="text-accent underline">
+        <Link href="/admin/sources" className="link">
           {t('sources')} →
         </Link>
       </p>

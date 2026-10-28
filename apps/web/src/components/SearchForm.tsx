@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import type { Vertical } from '@/lib/api';
+import { VerticalIcon } from './Art';
 import LocalityInput from './LocalityInput';
 
 export default function SearchForm({
@@ -31,7 +32,7 @@ export default function SearchForm({
           `/results?${new URLSearchParams({ vertical, q: q || (vertical === 'property' ? 'bhk' : q), locality, ...extra })}`,
         );
       }}
-      className="space-y-4 rounded-lg border border-line bg-surface p-4"
+      className="space-y-5"
     >
       <div role="tablist" aria-label={t('search.categories')} className="flex flex-wrap gap-2">
         {tabs.map((v) => (
@@ -41,15 +42,16 @@ export default function SearchForm({
             role="tab"
             aria-selected={vertical === v}
             onClick={() => setVertical(v)}
-            className={`rounded-full px-3 py-1.5 text-sm ${vertical === v ? 'bg-accent text-accent-fg' : 'border border-line text-ink-2'}`}
+            className="chip inline-flex items-center gap-2 !py-1.5 !pl-1.5"
           >
+            <VerticalIcon vertical={v} className="h-8 w-8" />
             {t(`verticals.${v}`)}
           </button>
         ))}
       </div>
       <div className="grid gap-3 sm:grid-cols-[2fr_1fr_auto] sm:items-end">
         <div>
-          <label htmlFor="q" className="mb-1 block text-sm font-medium text-ink">
+          <label htmlFor="q" className="label">
             {t('search.label')}
           </label>
           <input
@@ -59,12 +61,13 @@ export default function SearchForm({
             onChange={(e) => setQ(e.target.value)}
             required={vertical !== 'property'}
             placeholder={t(`search.placeholder.${vertical}`)}
-            className="w-full rounded border border-line bg-surface px-3 py-2 text-ink"
+            className="field"
           />
         </div>
         <LocalityInput value={locality} onChange={setLocality} />
-        <button type="submit" className="rounded bg-accent px-5 py-2 font-medium text-accent-fg">
+        <button type="submit" className="btn btn-primary justify-center !py-3.5 text-[17px]">
           {t('search.submit')}
+          <span className="dot dot-white" aria-hidden="true" />
         </button>
       </div>
     </form>
