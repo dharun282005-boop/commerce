@@ -1,0 +1,49 @@
+name: chennai-commerce
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: cuc
+      POSTGRES_PASSWORD: cuc_dev_password # local development only
+      POSTGRES_DB: cuc
+    ports: ['5432:5432']
+    volumes: ['pgdata:/var/lib/postgresql/data']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cuc -d cuc']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8-alpine
+    ports: ['6379:6379']
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    environment:
+      NODE_ENV: production
+      PORT: 4100
+      LOG_LEVEL: info
+      DATABASE_URL: postgres://cuc:cuc_dev_password@postgres:5432/cuc
+      REDIS_URL: redis://redis:6379
+      KILL_SWITCH_ALL: ${KILL_SWITCH_ALL:-false}
+      DISABLED_SOURCES: ${DISABLED_SOURCES:-}
+      FIXTURE_FAIL: ${FIXTURE_FAIL:-}
+    ports: ['4100:4100']
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:4100/health']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
