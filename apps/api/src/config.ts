@@ -17,6 +17,19 @@ const Env = z.object({
   ENABLED_SOURCES: z.string().optional(),
   FIXTURE_FAIL: z.string().optional(),
   SEED_ON_START: z.string().optional(),
+  IMPORT_DIR: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
+  ONDC_GATEWAY_URL: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
+  ONDC_MOCK: z.enum(['true', 'false']).default('true'),
+  ADMIN_TOKEN: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
 });
 export type Config = z.infer<typeof Env>;
 

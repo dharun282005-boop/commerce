@@ -68,11 +68,16 @@ with fees, total, `bestSinglePlatform` for comparison, and `unavailable` items.
 Offer detail with the same item on other platforms, similar items and an MRP check; price history
 points (sample history is marked `isSample: true`).
 
+### Phase D: data endpoints
+- `POST /v1/submissions`: report a price you saw (`vertical`, `url`, `title`, `priceRs`, `locality`, optional `deliveryRs`, `brand`, `quantity`). 201 or 400 with a reason.
+- `GET /v1/imports`: rows imported and per-row rejection reasons.
+- `POST /v1/admin/import` (`x-admin-token`): add rows; `POST /v1/admin/import/reload`: re-read `data/imports/`.
+- `POST /mock/ondc/search`: development mock of an ONDC gateway (`on_search`).
+
 ## Planned endpoints
 
 | Endpoint | Phase |
 |----------|-------|
-| `POST /v1/import` (tier-3 CSV/JSON), `POST /v1/submissions` (user price) | D |
 | `POST /v1/agent` (SSE stream) | E |
 | `POST /v1/alerts`, `GET /v1/me/export`, `DELETE /v1/me` | F/G |
 

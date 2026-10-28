@@ -71,6 +71,8 @@ export interface GuardOptions {
   random?: () => number;
   sleep?: (ms: number) => Promise<void>;
   onEvent?: (e: GuardEvent) => void;
+  /** Override the per-vertical cache TTL; 0 = never cache (local sources such as imports). */
+  cacheTtlMs?: number;
 }
 
 export type GuardEvent =
@@ -151,7 +153,8 @@ export class GuardedAdapter {
 
     // 2. Cache
     const key = cacheKey(this.adapter.id, query);
-    const cached = await this.safeCacheGet(key);
+    const useCache = this.opts.cacheTtlMs !== 0;
+    const cached = useCache ? await this.safeCacheGet(key) : null;
     if (cached) {
       this.opts.onEvent?.({ type: 'cache_hit', sourceId: this.adapter.id });
       return finish({
@@ -162,7 +165,7 @@ export class GuardedAdapter {
         droppedInvalid: 0,
       });
     }
-    this.opts.onEvent?.({ type: 'cache_miss', sourceId: this.adapter.id });
+    if (useCache) this.opts.onEvent?.({ type: 'cache_miss', sourceId: this.adapter.id });
 
     try {
       // 3. Rate limit and 4. circuit breaker
@@ -195,7 +198,12 @@ export class GuardedAdapter {
         }
       }
       const fetchedAt = new Date(this.clock()).toISOString();
-      await this.safeCacheSet(key, { offers, fetchedAt }, CACHE_TTL_MS[query.vertical]);
+      if (useCache)
+        await this.safeCacheSet(
+          key,
+          { offers, fetchedAt },
+          this.opts.cacheTtlMs ?? CACHE_TTL_MS[query.vertical],
+        );
       this.lastSuccessAt = this.clock();
       return finish({ status: 'ok', offers, fromCache: false, fetchedAt, droppedInvalid: dropped });
     } catch (err) {

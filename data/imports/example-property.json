@@ -1,0 +1,42 @@
+[
+  {
+    "externalId": "own-listing-velachery-2bhk",
+    "sourceName": "Owner listing (direct)",
+    "isSample": true,
+    "observedAt": "2026-10-29T06:00:00.000Z",
+    "vertical": "property",
+    "title": "2 BHK flat for rent near Velachery MRTS (owner direct)",
+    "url": "https://example.com/owner-direct/velachery-2bhk",
+    "pricePaise": 2400000,
+    "mrpPaise": null,
+    "fees": {
+      "deliveryPaise": null,
+      "handlingPaise": null,
+      "platformPaise": null,
+      "packagingPaise": null,
+      "taxesNotIncludedPaise": null
+    },
+    "coupons": [],
+    "rating": null,
+    "etaMinutes": null,
+    "trust": { "fulfilledByPlatform": null, "returnPolicyDays": null, "sellerRating": null },
+    "affiliate": false,
+    "listingType": "rent",
+    "bhk": 2,
+    "areaSqft": 980,
+    "depositPaise": 12000000,
+    "furnishing": "semi-furnished",
+    "floor": 1,
+    "totalFloors": 3,
+    "ageYears": 8,
+    "localityId": "velachery",
+    "pincode": "600042",
+    "geo": { "lat": 12.979, "lng": 80.2205 },
+    "amenities": ["parking", "water supply 24x7"],
+    "postedBy": "owner",
+    "postedAt": "2026-10-20T00:00:00.000Z",
+    "photoCount": 5,
+    "nearTransit": ["Velachery MRTS (approx. 500 m)"],
+    "description": "Sample owner listing supplied as a custom data file."
+  }
+]

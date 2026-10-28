@@ -40,11 +40,21 @@ describe('API', () => {
 
   it('GET /v1/sources lists compliance for every source', async () => {
     const res = await request(app.server).get('/v1/sources').expect(200);
-    expect(res.body.sources).toHaveLength(17);
+    const byId = Object.fromEntries(res.body.sources.map((s: { id: string }) => [s.id, s]));
+    const fixtures = res.body.sources.filter(
+      (s: { compliance: { tier: unknown } }) => s.compliance.tier === 'fixture',
+    );
+    expect(fixtures).toHaveLength(17);
     for (const s of res.body.sources) {
-      expect(s.compliance.tier).toBe('fixture');
-      expect(s.allowed.allowed).toBe(true);
+      expect(s.compliance).toHaveProperty('enabledByDefault');
+      expect(s.compliance).toHaveProperty('lastReviewed');
+      expect(s.health).toHaveProperty('breaker');
     }
+    // Official APIs and ONDC ship disabled.
+    expect(byId['amazon-in-official'].allowed.allowed).toBe(false);
+    expect(byId['flipkart-affiliate'].allowed.allowed).toBe(false);
+    expect(byId['ondc-mock'].allowed.allowed).toBe(false);
+    expect(byId['manual-import'].compliance.tier).toBe(3);
   });
 
   it('US-1 over HTTP: S24 FE 128GB in Velachery', async () => {
@@ -109,7 +119,10 @@ describe('API', () => {
     expect(recorded.flat().length).toBeGreaterThan(0);
     recorded.length = 0;
     const second = await request(app.server).post('/v1/search').send(body).expect(200);
-    expect(second.body.sources.every((s: { fromCache: boolean }) => s.fromCache)).toBe(true);
+    const cacheable = second.body.sources.filter(
+      (s: { sourceId: string; status: string }) => s.status === 'ok' && s.sourceId.startsWith('fixture-'),
+    );
+    expect(cacheable.every((s: { fromCache: boolean }) => s.fromCache)).toBe(true);
     await new Promise((r) => setImmediate(r));
     expect(recorded.flat()).toHaveLength(0);
   });

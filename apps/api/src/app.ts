@@ -1,7 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import {
+  amazonOfficialApi,
   createFixtureAdapters,
+  flipkartOfficialApi,
   GuardedAdapter,
+  ManualImportAdapter,
+  OndcAdapter,
+  UserSubmittedAdapter,
+  type Resolver,
+  type SubmissionStore,
   MemoryCache,
   parseFixtureFailures,
   policyFromEnv,
@@ -23,6 +30,7 @@ import { z } from 'zod';
 import type { Config } from './config.ts';
 import { Metrics } from './metrics.ts';
 import { coreRoutes } from './routes/core.ts';
+import { dataRoutes } from './routes/data.ts';
 import { createServices, type Services } from './services.ts';
 
 export interface AppDeps {
@@ -36,6 +44,9 @@ export interface AppDeps {
   /** Extra adapters (Phase D: imports, user submissions, ONDC). Fixture adapters are always included. */
   adapters?: SourceAdapter[];
   now?: () => Date;
+  submissionStore?: SubmissionStore;
+  /** DNS resolver for the SSRF guard (tests inject a fake). */
+  resolver?: Resolver;
   /** Lets later phases register more routes with access to the shared services. */
   plugins?: Array<(app: FastifyInstance, ctx: { services: Services; metrics: Metrics }) => Promise<void>>;
 }
@@ -94,8 +105,16 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   const policy = policyFromEnv(config);
   const cache = deps.cache ?? new MemoryCache();
+  const importer = new ManualImportAdapter(config.IMPORT_DIR ?? null);
+  const userSubmitted = new UserSubmittedAdapter(deps.submissionStore, deps.resolver, now);
+  const localSources = new Set([importer.id, userSubmitted.id]);
   const adapters = [
     ...createFixtureAdapters({ failures: parseFixtureFailures(config.FIXTURE_FAIL) }),
+    importer,
+    userSubmitted,
+    new OndcAdapter(config.ONDC_GATEWAY_URL ?? null),
+    amazonOfficialApi(),
+    flipkartOfficialApi(),
     ...(deps.adapters ?? []),
   ];
   const guarded = adapters.map(
@@ -103,6 +122,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       new GuardedAdapter(a, {
         policy,
         cache,
+        // Local data changes when someone imports or submits, so it is never cached.
+        cacheTtlMs: localSources.has(a.id) ? 0 : undefined,
         onEvent: (e) => {
           if (e.type === 'result')
             metrics.inc('source_results_total', { source: e.sourceId, status: e.status });
@@ -164,6 +185,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   });
 
   await app.register(coreRoutes, { services, metrics });
+  await app.register(dataRoutes, { importer, userSubmitted, config, now, metrics });
   for (const plugin of deps.plugins ?? []) await plugin(app, { services, metrics });
 
   return app;

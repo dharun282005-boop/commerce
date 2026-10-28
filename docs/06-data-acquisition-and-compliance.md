@@ -62,6 +62,22 @@ Terms have been reviewed in full yet, so every source stays disabled.
 **Before any tier-4 adapter is written, we stop and ask the owner** with a summary of that site's
 robots.txt and Terms (rule 1). The snapshot above is input to that conversation, not a decision.
 
+## Adapters built (Phase D, 2026-10-29)
+
+| Adapter id | Tier | Default | What it does | Compliance basis |
+|------------|------|---------|--------------|------------------|
+| `fixture-*` (17) | fixture | on | Labelled sample data imitating each platform | No platform contacted |
+| `manual-import` | 3 | on | Loads the owner's CSV/JSON files from `data/imports/` (+ admin endpoint) | Owner's own data; rows are sample unless marked otherwise |
+| `user-submitted` | 3 | on | Prices users saw in their own session, with a link | Link checked (https, allow-list, public IPs only) and **never fetched**; confidence 0.5; expires (1 day grocery, 3 days shopping) |
+| `ondc-mock` | 2 | **off** | Beckn `search` against a mock gateway (`/mock/ondc`) | Real ONDC needs onboarding; only `search` exists, never `select/init/confirm` |
+| `amazon-in-official` | 1 | **off** | Stub; throws "not configured" | Needs credentials + owner approval |
+| `flipkart-affiliate` | 1 | **off** | Stub; throws "not configured" | Needs credentials + owner approval |
+
+**No tier-4 (scraping) adapter exists.** None was requested, and the robots.txt snapshot below
+shows most sources forbid or block it.
+
+Every adapter's compliance record and live health is visible at `GET /v1/sources`.
+
 ## Compliance matrix (who could be enabled, and how)
 
 | Source | Best legal route | Status |

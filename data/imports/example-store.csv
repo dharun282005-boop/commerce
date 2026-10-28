@@ -1,0 +1,5 @@
+vertical,external_id,source_name,is_sample,title,url,price_rs,mrp_rs,delivery_rs,rating,rating_count,eta_min,return_days,brand,model,storage_gb,ram_gb,colour,category,product,quantity,pincodes,min_order_rs,free_delivery_above_rs
+shopping,tn-mobiles-s24fe-128,T Nagar Mobiles,true,Samsung Galaxy S24 FE 5G 128GB Mint (8GB RAM),https://example.com/t-nagar-mobiles/s24fe-128,34790,59999,0,4.5,64,240,7,Samsung,Galaxy S24 FE,128,8,Mint,mobiles,,,600017 600083 600024,,
+shopping,tn-mobiles-iphone16,T Nagar Mobiles,true,Apple iPhone 16 128GB Black,https://example.com/t-nagar-mobiles/iphone16-128,70490,79900,0,4.6,41,240,7,Apple,iPhone 16,128,,Black,mobiles,,,600017 600083 600024,,
+grocery,vel-kirana-rice-1kg,Velachery Kirana,true,Sona Masoori Raw Rice 1 kg,https://example.com/velachery-kirana/rice,71,90,20,,,40,,,,,,,rice,Sona Masoori Raw Rice,1 kg,600042 600032 600100,100,250
+grocery,vel-kirana-eggs-12,Velachery Kirana,true,Farm Fresh White Eggs 12 pc,https://example.com/velachery-kirana/eggs,84,105,20,,,40,,,,,,,eggs,Farm Fresh White Eggs,12 pc,600042 600032 600100,100,250

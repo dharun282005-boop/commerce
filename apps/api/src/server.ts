@@ -6,6 +6,9 @@ import { loadConfig } from './config.ts';
 import { RedisCache } from './redis-cache.ts';
 
 const config = loadConfig();
+// Default folder for owner-supplied data files (tier 3).
+config.IMPORT_DIR ??= new URL('../../../data/imports', import.meta.url).pathname;
+config.ONDC_GATEWAY_URL ??= `http://127.0.0.1:${config.PORT}/mock/ondc`;
 const deps: AppDeps = { config };
 const closers: Array<() => Promise<unknown>> = [];
 

@@ -35,6 +35,9 @@ services:
       KILL_SWITCH_ALL: ${KILL_SWITCH_ALL:-false}
       DISABLED_SOURCES: ${DISABLED_SOURCES:-}
       FIXTURE_FAIL: ${FIXTURE_FAIL:-}
+      ENABLED_SOURCES: ${ENABLED_SOURCES:-ondc-mock}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      IMPORT_DIR: /app/data/imports
     ports: ['4100:4100']
     depends_on:
       postgres: { condition: service_healthy }

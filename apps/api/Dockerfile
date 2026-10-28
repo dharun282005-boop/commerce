@@ -10,6 +10,7 @@ RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY tsconfig.base.json ./
 COPY packages ./packages
 COPY apps/api ./apps/api
+COPY data ./data
 USER node
 ENV SEED_ON_START=true
 EXPOSE 4100
