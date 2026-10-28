@@ -53,13 +53,15 @@ describe('API', () => {
       .send({ vertical: 'shopping', q: 'Samsung Galaxy S24 FE 128GB', locality: 'Velachery' })
       .expect(200);
     expect(res.body.sampleData).toBe(true);
-    expect(res.body.offers.length).toBeGreaterThanOrEqual(4);
-    expect(
-      res.body.offers.every((o: Offer) => o.vertical === 'shopping' && o.variant.storageGb === 128),
-    ).toBe(true);
-    expect(res.body.offers.every((o: Offer) => o.provenance.sourceName && o.provenance.observedAt)).toBe(
-      true,
-    );
+    const offers: Offer[] = res.body.results.map((r: { offer: Offer }) => r.offer);
+    expect(offers.length).toBeGreaterThanOrEqual(4);
+    expect(offers.every((o) => o.vertical === 'shopping' && o.variant.storageGb === 128)).toBe(true);
+    expect(offers.every((o) => o.provenance.sourceName && o.provenance.observedAt)).toBe(true);
+    // Ranked: the flagged too-cheap listing is last; the top result's breakdown adds up to its score.
+    expect(res.body.results.at(-1).flags).toContain('price_anomaly');
+    const top = res.body.results[0];
+    const sum = Object.values(top.contributions as Record<string, number>).reduce((a, b) => a + b, 0);
+    expect(Math.abs(sum - top.score)).toBeLessThan(1e-9);
   });
 
   it('US-2 over HTTP: veg biryani for 2 in Adyar', async () => {
@@ -72,7 +74,7 @@ describe('API', () => {
         filters: { vegOnly: true, minServings: 2, maxPricePaise: 30000, maxEtaMinutes: 40 },
       })
       .expect(200);
-    expect(res.body.offers.length).toBeGreaterThanOrEqual(2);
+    expect(res.body.results.length).toBeGreaterThanOrEqual(2);
   });
 
   it('US-3 over HTTP: grocery items in T Nagar', async () => {
@@ -81,7 +83,7 @@ describe('API', () => {
         .post('/v1/search')
         .send({ vertical: 'grocery', q, locality: 'T Nagar' })
         .expect(200);
-      expect(res.body.offers.length, q).toBeGreaterThan(0);
+      expect(res.body.results.length, q).toBeGreaterThan(0);
     }
   });
 
@@ -96,7 +98,7 @@ describe('API', () => {
       })
       .expect(200);
     expect(res.body.area.localityIds).toContain('sholinganallur');
-    expect(res.body.offers.length).toBeGreaterThanOrEqual(5);
+    expect(res.body.results.length).toBeGreaterThanOrEqual(5);
   });
 
   it('records fresh observations but not cached ones', async () => {
@@ -150,7 +152,7 @@ describe('API failure isolation and kill switches', () => {
       .expect(200);
     const zomato = res.body.sources.find((s: { sourceId: string }) => s.sourceId === 'fixture-zomato');
     expect(zomato.status).toBe('unavailable');
-    expect(res.body.offers.length).toBeGreaterThan(0);
+    expect(res.body.results.length).toBeGreaterThan(0);
     await app.close();
   });
 
@@ -160,8 +162,69 @@ describe('API failure isolation and kill switches', () => {
       .post('/v1/search')
       .send({ vertical: 'shopping', q: 'phone', locality: 'Adyar' })
       .expect(200);
-    expect(res.body.offers).toHaveLength(0);
+    expect(res.body.results).toHaveLength(0);
     expect(res.body.sources.every((s: { status: string }) => s.status === 'disabled')).toBe(true);
     await app.close();
+  });
+});
+
+describe('Phase C endpoints', () => {
+  let app: FastifyInstance;
+  beforeAll(async () => {
+    app = await makeApp();
+  });
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('US-3: POST /v1/cart/plan splits the headline list', async () => {
+    const res = await request(app.server)
+      .post('/v1/cart/plan')
+      .send({ list: '2 kg rice, 1 L milk, 12 eggs', locality: 'T Nagar' })
+      .expect(200);
+    expect(res.body.plan.feasible).toBe(true);
+    expect(res.body.plan.unavailable).toEqual([]);
+    expect(res.body.plan.orders.length).toBeGreaterThanOrEqual(1);
+    expect(res.body.sampleData).toBe(true);
+  });
+
+  it('presets change the order', async () => {
+    const body = { vertical: 'shopping', q: 'Galaxy S24 FE 128GB', locality: 'Adyar' };
+    const cheap = await request(app.server)
+      .post('/v1/search')
+      .send({ ...body, preset: 'cheapest' })
+      .expect(200);
+    const fast = await request(app.server)
+      .post('/v1/search')
+      .send({ ...body, preset: 'fastest' })
+      .expect(200);
+    expect(cheap.body.results[0].offer.id).not.toBe(fast.body.results[0].offer.id);
+  });
+
+  it('GET /v1/offers/:id returns the same item across platforms, and history', async () => {
+    const d = await request(app.server).get('/v1/offers/fixture-flipkart:s24fe-128-1').expect(200);
+    expect(d.body.sameItem.length).toBeGreaterThanOrEqual(4);
+    expect(
+      d.body.sameItem.every(
+        (r: { offer: Offer }) => r.offer.vertical === 'shopping' && r.offer.variant.storageGb === 128,
+      ),
+    ).toBe(true);
+    const h = await request(app.server)
+      .get('/v1/offers/fixture-flipkart:s24fe-128-1/history?days=30')
+      .expect(200);
+    expect(h.body.points).toHaveLength(30);
+    expect(h.body.points.every((p: { isSample: boolean }) => p.isSample)).toBe(true);
+    await request(app.server).get('/v1/offers/fixture-flipkart:nope').expect(404);
+  });
+
+  it('POST /v1/explain gives a plain-language breakdown', async () => {
+    const body = {
+      vertical: 'food',
+      q: 'veg biryani',
+      locality: 'Adyar',
+      offerId: 'fixture-swiggy:mbh-veg-biryani-2',
+    };
+    const res = await request(app.server).post('/v1/explain').send(body).expect(200);
+    expect(res.body.lines[0]).toMatch(/^Score/);
   });
 });

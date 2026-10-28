@@ -183,7 +183,7 @@ export const DISHES: Dish[] = [
       },
       {
         source: 'fixture-zomato',
-        price: 279,
+        price: 235,
         delivery: 30,
         packaging: 15,
         platform: 6,

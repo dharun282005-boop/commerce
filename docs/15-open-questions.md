@@ -28,3 +28,6 @@
 | 06 | Current ONDC retail and F&B API spec location |
 | 06 | Full Terms of Service review for every source before any change to "disabled" |
 | 08 | Current prompt-caching syntax and minimum cacheable length in the Claude docs |
+| 07, eval | A fresh, unseen set of real product titles to measure matching honestly (the held-out set was used to improve the rules) |
+| 07 | Embedding layer: no embedding model chosen yet (needs an API or local model); pgvector is installed but unused |
+| `fixtures/sources.ts` | Terms-of-Service URLs for each platform have not been opened/verified |

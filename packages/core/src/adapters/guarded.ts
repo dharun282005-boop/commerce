@@ -216,6 +216,22 @@ export class GuardedAdapter {
     }
   }
 
+  /** Looks up one offer by its external id. Same gate, rate limit and timeout as search; no cache. */
+  async getOffer(externalId: string, ctx: SearchContext): Promise<Offer | null> {
+    if (!this.isAllowed().allowed || !this.adapter.capabilities.supportsGetOffer) return null;
+    if (!this.bucket.tryTake() || !this.breaker.canRequest()) return null;
+    try {
+      const raw = await this.withTimeout((signal) => this.adapter.getOffer(externalId, { ...ctx, signal }));
+      this.breaker.onSuccess();
+      if (!raw) return null;
+      const parsed = Offer.safeParse(this.adapter.normalise(raw, ctx));
+      return parsed.success ? parsed.data : null;
+    } catch {
+      this.breaker.onFailure();
+      return null;
+    }
+  }
+
   async health(): Promise<GuardedHealth> {
     let adapter: { ok: boolean; detail?: string };
     try {

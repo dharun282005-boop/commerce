@@ -50,17 +50,28 @@ Response:
 }
 ```
 
-In Phase B, offers are filtered and sorted by **item price only**. They are not yet ranked, and
-`maxPricePaise` checks item price, not landed cost. Ranking, landed cost and anomaly flags arrive in
-Phase C. This is why the deliberate "too cheap" trap listings sort first for now.
+Since Phase C the response has `results[]` (ranked), `groups[]` (same item across platforms) and
+`weights`. Each result has `offer`, `rank`, `score`, `landed` (cost lines), `adjustedRating`,
+`components`, `contributions` (sum = score), `flags`, `notes`; property results also have
+`property` (price per sqft vs median, age) and `alsoListedOn` (duplicates on other portals).
+Optional body fields: `preset` (`cheapest|best_rated|fastest|balanced`) or `weights`.
+`maxPricePaise` is checked against the landed cost.
+
+### `POST /v1/explain`
+Same body as search plus `offerId`; returns plain-language lines for "Why is this ranked here?".
+
+### `POST /v1/cart/plan`
+`{ list: "2 kg rice, 1 L milk, 12 eggs", locality: "T Nagar" }` → parsed needs, per-platform orders
+with fees, total, `bestSinglePlatform` for comparison, and `unavailable` items.
+
+### `GET /v1/offers/:id` and `GET /v1/offers/:id/history?days=30`
+Offer detail with the same item on other platforms, similar items and an MRP check; price history
+points (sample history is marked `isSample: true`).
 
 ## Planned endpoints
 
 | Endpoint | Phase |
 |----------|-------|
-| `POST /v1/compare` (groups + scores + breakdown) | C |
-| `POST /v1/cart/plan` | C |
-| `GET /v1/offers/:id/history?days=30` | C/F |
 | `POST /v1/import` (tier-3 CSV/JSON), `POST /v1/submissions` (user price) | D |
 | `POST /v1/agent` (SSE stream) | E |
 | `POST /v1/alerts`, `GET /v1/me/export`, `DELETE /v1/me` | F/G |

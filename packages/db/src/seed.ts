@@ -3,12 +3,13 @@ import {
   createFixtureAdapters,
   LOCALITIES,
   Offer,
+  sampleHistory,
   type SearchContext,
 } from '@cuc/core';
 import { sql } from 'drizzle-orm';
 import { createDb } from './client.ts';
 import { ObservationStore } from './observations.ts';
-import { localities, sources } from './schema.ts';
+import { localities, priceObservations, sources } from './schema.ts';
 
 /** Loads localities, the source registry and one snapshot of every fixture offer. Safe to re-run. */
 export async function seed(url: string) {
@@ -56,6 +57,30 @@ export async function seed(url: string) {
     const ctx: SearchContext = { requestId: 'seed', now: () => new Date() };
     const store = new ObservationStore(db);
     let count = 0;
+    let historyRows = 0;
+    // 90 days of SAMPLE price history per fixture offer (is_sample = true), once per offer.
+    const seedHistory = async (offers: Offer[]) => {
+      const { rows } = await pool.query(
+        "select distinct offer_id from price_observations where observed_at < now() - interval '2 days'",
+      );
+      const done = new Set(rows.map((r) => r.offer_id as string));
+      const values = offers
+        .filter((o) => !done.has(o.id))
+        .flatMap((o) =>
+          sampleHistory(o.id, o.provenance.sourceId, o.pricePaise, 90, new Date()).map((p) => ({
+            offerId: o.id,
+            sourceId: p.sourceId,
+            vertical: o.vertical,
+            pricePaise: p.pricePaise,
+            fees: o.fees,
+            observedAt: new Date(p.observedAt),
+            isSample: true,
+          })),
+        );
+      for (let i = 0; i < values.length; i += 1000)
+        await db.insert(priceObservations).values(values.slice(i, i + 1000));
+      return values.length;
+    };
     for (const a of adapters) {
       for (const vertical of a.capabilities.verticals) {
         const raws = await a.search(
@@ -68,10 +93,12 @@ export async function seed(url: string) {
           },
           ctx,
         );
-        count += await store.record(raws.map((r) => Offer.parse(a.normalise(r, ctx))));
+        const offers = raws.map((r) => Offer.parse(a.normalise(r, ctx)));
+        count += await store.record(offers);
+        historyRows += await seedHistory(offers);
       }
     }
-    return { localities: LOCALITIES.length, sources: adapters.length, offers: count };
+    return { localities: LOCALITIES.length, sources: adapters.length, offers: count, historyRows };
   } finally {
     await pool.end();
   }

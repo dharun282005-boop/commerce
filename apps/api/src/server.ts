@@ -1,4 +1,4 @@
-import { createDb, MIGRATIONS_FOLDER, ObservationStore, seed } from '@cuc/db';
+import { createDb, MIGRATIONS_FOLDER, ObservationStore, PgHistoryStore, seed } from '@cuc/db';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Redis } from 'ioredis';
 import { buildApp, type AppDeps } from './app.ts';
@@ -25,6 +25,7 @@ if (config.DATABASE_URL) {
   }
   const store = new ObservationStore(db);
   deps.recordObservations = (offers) => store.record(offers);
+  deps.history = new PgHistoryStore(pool);
   deps.pingDb = async () => (await pool.query('select 1')).rowCount === 1;
   closers.push(() => pool.end());
 }

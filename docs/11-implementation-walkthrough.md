@@ -4,7 +4,7 @@
 |-------|--------|---------------------------------------------------------------|--------|
 | A | Docs blueprint, compliance matrix, decision list | Docs reviewed by owner | Done (2026-10-28) |
 | B | Monorepo, Docker Compose, migrations, schemas, localities, FixtureAdapter (4 verticals), GuardedAdapter, search API | `npm run ci` green; `docker compose up` healthy; fixture search returns data | Done (2026-10-28) |
-| C | Normalisation, matching + eval set, Bayesian rating, landed cost, score, cart split, property dedupe | Eval report (P/R/F1) and hand-computed unit tests | Next |
+| C | Normalisation, matching + eval set, Bayesian rating, landed cost, score, cart split, property dedupe | Eval report (P/R/F1) and hand-computed unit tests | Done (2026-10-29) |
 | D | Real adapters, **only with per-source approval** | Compliance record + health checks per source | Waiting on owner |
 | E | Agent tools, system prompt, streaming, safety, evals | `npm run eval` report | — |
 | F | Web app, i18n, a11y, perf, PWA | Playwright e2e for US-1..US-4 | — |

@@ -1,6 +1,6 @@
 # 07 · Matching and ranking algorithms
 
-Built in Phase C. This page is the blueprint; hand-computed examples here become unit tests.
+Built in Phase C (`packages/core/src/{rank,match,cart,property,history}`). The hand-computed examples here are unit tests in `packages/core/test/phase-c.test.ts`. Results: [phase-C-eval.md](progress/phase-C-eval.md).
 
 ## 1. Landed cost
 
@@ -60,6 +60,11 @@ score = Σ wₖ · sₖ / Σ wₖ
 | Balanced (default) | 0.40 | 0.25 | 0.20 | 0.15 |
 
 "Why is this #1?" shows each `wₖ · sₖ / Σw`, and these add up exactly to the score.
+
+**Flagged offers are listed last.** An offer with a price anomaly, suspicious (instruction-like) text,
+a below-market property price, or a request for money/ID before a visit keeps its honest score and
+breakdown, but is sorted after all unflagged offers and shown with a warning. Without this, "Cheapest"
+would put likely scams first.
 `affiliate` is **not an input** to any function above. A property-based test toggles it on random
 inputs and checks the order never changes.
 
@@ -74,7 +79,9 @@ function match(a, b):
   for attr in [storageGb, ramGb, size, quantity]:
     if a.attr and b.attr and normalise(a.attr) != normalise(b.attr):
       return {decision: "different", confidence: 0.99, reason: "variant differs: " + attr}
-  # Layer 1: exact identifiers
+  # Layer 0b (titles): only one title has a variant word (pro, max, plus, ultra, mini, lite, anc, fe, …)
+  #   or the model codes conflict ("A55" vs "A35", "1.5 ton" vs "1 ton") → different
+  # Layer 1: exact identifiers, or a shared long model code ("FHM1207SDW")
   if shared non-null id among (gtin, asin, mpn, modelNumber) and equal:
     return {decision: "same", confidence: 0.99, reason: "same " + idName}
   # Layer 2: rules
@@ -93,7 +100,7 @@ function match(a, b):
   extra words ("5G", "with charger") hurt less.
 - **Blocking**: only compare offers within the same brand (or the same first title token) so we don't
   compare all pairs. That takes the work from O(N²) to roughly O(Σ bᵢ²) over blocks.
-- **Evaluation**: ≥ 200 labelled pairs in `packages/core/eval/match-pairs.json`, including hard
+- **Evaluation**: 391 labelled pairs built by `packages/core/eval/match-eval.ts` (fixture pairs with known ground truth + 60 hand-written title pairs in `eval/heldout-pairs.ts`), including hard
   negatives (128 vs 256 GB, different colours, 500 g vs 1 kg). We report precision, recall and F1.
 
 ## 5. Cart splitting (grocery)
@@ -114,8 +121,15 @@ local search (repeat until no improvement):
   close:     move all items of one platform to their best other open platform if the total drops
 ```
 
-- Exhaustive: `|P|^|I|` assignments, used in tests for |I| ≤ 6, |P| ≤ 4 (≤ 4,096 cases).
-- Heuristic: O(k · |I| · |P|) per pass, k = number of improving passes (small in practice).
+- The heuristic restarts from several points (greedy, and "all on platform P" for each P) and keeps the best.
+- Exhaustive: `|P|^|I|` assignments.
+- **What the app runs:** exact search when there are ≤ 20,000 combinations (e.g. 6 items × 5 platforms),
+  otherwise the heuristic. Benchmark on 1,000 random lists (2–6 items, 2–4 platforms): heuristic optimal
+  in 97%, mean gap 0.22%, worst 21.6% (see the eval report). That worst case is why exact search is used
+  whenever it is cheap.
+- Heuristic cost: O(s · k · |I| · |P|) for s starts and k improving passes.
+- A platform below its minimum order gets a penalty of 10¹² + 1000 × shortfall, so local search is
+  pulled steeply towards feasible plans.
 
 ## 6. Property dedupe
 
@@ -124,6 +138,9 @@ Two listings are the **same property** when all of these hold:
 - haversine distance ≤ 50 m;
 - `|areaA − areaB| / max(areaA, areaB) ≤ 5%`;
 - `|priceA − priceB| / max(priceA, priceB) ≤ 5%`.
+
+The locality median needs ≥ 5 listings of the same type; with fewer, the zone median (e.g. all OMR
+localities) is used, and the basis is shown to the user.
 
 Perceptual image hashing is used only if image access is legally permitted (not in fixture mode).
 Stale: posted more than 45 days ago. Scam signals: below 0.6 × locality median per sqft, zero

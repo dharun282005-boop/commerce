@@ -1,5 +1,6 @@
 import type { GuardedAdapter } from './adapters/guarded.ts';
 import type { SearchContext, SourceResult } from './adapters/types.ts';
+import { landedCost } from './rank/landed.ts';
 import type { Offer, SearchFilters, SearchQuery } from './schemas.ts';
 
 export interface SearchOutcome {
@@ -12,7 +13,7 @@ export interface SearchOutcome {
  * GuardedAdapter never throws, and allSettled guards against bugs, so a single source can
  * never fail the whole search (FR-ADP-04).
  *
- * Phase B: offers are filtered and sorted by item price only. Ranking arrives in Phase C.
+ * Offers come back filtered and sorted by item price; use compareOffers() to rank them.
  */
 export async function searchAll(
   sources: GuardedAdapter[],
@@ -47,9 +48,9 @@ export async function searchAll(
   return { offers, sources: results.map(({ offers: _o, ...rest }) => ({ ...rest, offerCount: _o.length })) };
 }
 
-/** Filters apply the same way to every source. `maxPricePaise` checks item price until landed cost exists (Phase C). */
+/** Filters apply the same way to every source. `maxPricePaise` is checked against the landed cost. */
 export function passesFilters(o: Offer, f: SearchFilters): boolean {
-  if (f.maxPricePaise !== undefined && o.pricePaise > f.maxPricePaise) return false;
+  if (f.maxPricePaise !== undefined && landedCost(o).totalPaise > f.maxPricePaise) return false;
   if (f.maxEtaMinutes !== undefined && (o.etaMinutes === null || o.etaMinutes > f.maxEtaMinutes))
     return false;
   if (o.vertical === 'food') {
