@@ -31,6 +31,10 @@ import type { Config } from './config.ts';
 import { Metrics } from './metrics.ts';
 import { coreRoutes } from './routes/core.ts';
 import { dataRoutes } from './routes/data.ts';
+import { agentRoutes } from './routes/agent.ts';
+import { claudeFromEnv, type AgentModel } from './agent/models.ts';
+import { ScriptedModel } from './agent/scripted.ts';
+import type { AgentLimits } from './agent/loop.ts';
 import { createServices, type Services } from './services.ts';
 
 export interface AppDeps {
@@ -45,6 +49,9 @@ export interface AppDeps {
   adapters?: SourceAdapter[];
   now?: () => Date;
   submissionStore?: SubmissionStore;
+  /** Agent model; default: Claude if ANTHROPIC_MODEL + credentials are set, else the offline planner. */
+  agentModel?: AgentModel;
+  agentLimits?: Partial<AgentLimits>;
   /** DNS resolver for the SSRF guard (tests inject a fake). */
   resolver?: Resolver;
   /** Lets later phases register more routes with access to the shared services. */
@@ -124,6 +131,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         cache,
         // Local data changes when someone imports or submits, so it is never cached.
         cacheTtlMs: localSources.has(a.id) ? 0 : undefined,
+        // Strict per-source limits protect real platforms; sample and local data need none.
+        rateLimit:
+          a.compliance.tier === 'fixture' || localSources.has(a.id)
+            ? { capacity: 10_000, refillPerSecond: 10_000 }
+            : { capacity: 10, refillPerSecond: 2 },
         onEvent: (e) => {
           if (e.type === 'result')
             metrics.inc('source_results_total', { source: e.sourceId, status: e.status });
@@ -186,6 +198,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   await app.register(coreRoutes, { services, metrics });
   await app.register(dataRoutes, { importer, userSubmitted, config, now, metrics });
+  const agentModel = deps.agentModel ?? claudeFromEnv() ?? new ScriptedModel();
+  await app.register(agentRoutes, { services, metrics, model: agentModel, now, limits: deps.agentLimits });
   for (const plugin of deps.plugins ?? []) await plugin(app, { services, metrics });
 
   return app;

@@ -74,11 +74,15 @@ points (sample history is marked `isSample: true`).
 - `POST /v1/admin/import` (`x-admin-token`): add rows; `POST /v1/admin/import/reload`: re-read `data/imports/`.
 - `POST /mock/ondc/search`: development mock of an ONDC gateway (`on_search`).
 
+### Phase E: agent
+- `POST /v1/agent` `{ message, sessionId?, preferences? }` → `{ sessionId, text, cards[], toolCalls[], grounding, limitsHit, usage, model, live }`.
+  With `?stream=true`: Server-Sent Events `session`, `status`, `text`, `tool_call`, `tool_result`, `done` (or `error`).
+- `GET /v1/agent/status`; `DELETE /v1/agent/sessions/:id`.
+
 ## Planned endpoints
 
 | Endpoint | Phase |
 |----------|-------|
-| `POST /v1/agent` (SSE stream) | E |
 | `POST /v1/alerts`, `GET /v1/me/export`, `DELETE /v1/me` | F/G |
 
 ## Errors

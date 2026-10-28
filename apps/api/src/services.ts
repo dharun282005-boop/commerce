@@ -1,6 +1,7 @@
 import {
   buildCartInputs,
   compareOffers,
+  DEMOTING_FLAGS,
   LOCALITIES,
   MemoryHistoryStore,
   mrpCheck,
@@ -31,6 +32,7 @@ export interface Services {
   planCart(input: { list: string; locality: string }, requestId: string): Promise<CartResult>;
   offerDetail(offerId: string, requestId: string): Promise<OfferDetail | null>;
   history(offerId: string, days: number): Promise<HistoryResult>;
+  getOffers(ids: string[], requestId: string): Promise<Offer[]>;
   resolve(locality: string): ResolvedArea | null;
   sources: GuardedAdapter[];
 }
@@ -173,7 +175,10 @@ export function createServices(deps: ServiceDeps): Services {
         { requestId, now },
       );
       record(outcome);
-      byNeed.set(n.id, outcome.offers as GroceryOffer[]);
+      // Never put flagged offers (price anomaly, instruction-like text) into a cart plan.
+      const ranked = compareOffers(outcome.offers, { now: now() }).results;
+      const safe = ranked.filter((r) => !r.flags.some((f) => DEMOTING_FLAGS.includes(f))).map((r) => r.offer);
+      byNeed.set(n.id, safe as GroceryOffer[]);
       sample ||= outcome.offers.some((o) => o.provenance.isSample);
       for (const s of outcome.sources)
         if (!sourceStatus.has(s.sourceId) || s.status !== 'ok') sourceStatus.set(s.sourceId, s);
@@ -236,5 +241,21 @@ export function createServices(deps: ServiceDeps): Services {
     };
   }
 
-  return { search, planCart, offerDetail, history: getHistory, resolve: resolveArea, sources };
+  async function getOffers(ids: string[], requestId: string): Promise<Offer[]> {
+    const out: Offer[] = [];
+    for (const id of ids) {
+      const seen = lastSeen.get(id);
+      if (seen) {
+        out.push(seen);
+        continue;
+      }
+      const [sourceId, ...rest] = id.split(':');
+      const src = sources.find((s) => s.id === sourceId);
+      const o = src && rest.length ? await src.getOffer(rest.join(':'), { requestId, now }) : null;
+      if (o) out.push(o);
+    }
+    return out;
+  }
+
+  return { search, planCart, offerDetail, history: getHistory, getOffers, resolve: resolveArea, sources };
 }
