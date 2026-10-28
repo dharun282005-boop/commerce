@@ -31,3 +31,5 @@
 | 07, eval | A fresh, unseen set of real product titles to measure matching honestly (the held-out set was used to improve the rules) |
 | 07 | Embedding layer: no embedding model chosen yet (needs an API or local model); pgvector is installed but unused |
 | `fixtures/sources.ts` | Terms-of-Service URLs for each platform have not been opened/verified |
+| 10, `messages/ta.json` | Tamil UI strings, checked by a native reader |
+| 10 | Manual screen-reader pass (VoiceOver/TalkBack) |

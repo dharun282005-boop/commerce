@@ -38,15 +38,35 @@ services:
       ENABLED_SOURCES: ${ENABLED_SOURCES:-ondc-mock}
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
       IMPORT_DIR: /app/data/imports
+      WEB_ORIGIN: http://localhost:3100
+      SMTP_URL: smtp://mailpit:1025
+      ALERT_SECRET: ${ALERT_SECRET:-dev-only-alert-secret-change-me}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
     ports: ['4100:4100']
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
+      mailpit: { condition: service_started }
     healthcheck:
       test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4100/health']
       interval: 5s
       timeout: 3s
       retries: 20
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args: { NEXT_PUBLIC_API_URL: 'http://localhost:4100' }
+    ports: ['3100:3100']
+    depends_on:
+      api: { condition: service_healthy }
+
+  # Development mail catcher: alert emails appear at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports: ['8025:8025', '1025:1025']
 
 volumes:
   pgdata:

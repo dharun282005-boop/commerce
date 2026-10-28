@@ -20,7 +20,9 @@
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "ci": "npm run lint && npm run typecheck && npm test",
-    "eval": "tsx apps/api/eval/run.ts"
+    "eval": "tsx apps/api/eval/run.ts",
+    "dev:web": "npm run dev -w @cuc/web",
+    "e2e": "npm run e2e -w @cuc/web"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

@@ -7,7 +7,7 @@
 | C | Normalisation, matching + eval set, Bayesian rating, landed cost, score, cart split, property dedupe | Eval report (P/R/F1) and hand-computed unit tests | Done (2026-10-29) |
 | D | Real adapters, **only with per-source approval** | Compliance record + health checks per source | Done for approval-free sources (2026-10-29); real platforms still need owner approval |
 | E | Agent tools, system prompt, streaming, safety, evals | `npm run eval` report | Done (2026-10-29), offline planner; Claude run needs a key |
-| F | Web app, i18n, a11y, perf, PWA | Playwright e2e for US-1..US-4 | — |
+| F | Web app, i18n, a11y, perf, PWA | Playwright e2e for US-1..US-4 | Done (2026-10-29) |
 | G | Security review, load test, observability, deployment guide, final report | Review checklist + load test numbers | — |
 
 ## Phase B steps (as built)

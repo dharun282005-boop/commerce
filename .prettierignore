@@ -3,3 +3,4 @@ package-lock.json
 docs
 PROMPT.md
 packages/db/migrations/meta
+apps/web/.next

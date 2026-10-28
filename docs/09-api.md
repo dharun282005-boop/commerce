@@ -79,11 +79,16 @@ points (sample history is marked `isSample: true`).
   With `?stream=true`: Server-Sent Events `session`, `status`, `text`, `tool_call`, `tool_result`, `done` (or `error`).
 - `GET /v1/agent/status`; `DELETE /v1/agent/sessions/:id`.
 
+### Phase F: alerts and my data
+- `POST /v1/alerts` `{ email, offerId, thresholdRs, locale }` → 202; emails a confirmation link (double opt-in).
+- `POST /v1/alerts/verify` `{ token }` → `{ accessToken, alert }` (the link is the "magic link").
+- `GET /v1/me` / `DELETE /v1/me` / `DELETE /v1/me/alerts/:id` with `Authorization: Bearer <accessToken>`: export or delete.
+Alerts fire at most once a day per alert when a fresh observation's landed cost is at or below the threshold.
+
 ## Planned endpoints
 
 | Endpoint | Phase |
 |----------|-------|
-| `POST /v1/alerts`, `GET /v1/me/export`, `DELETE /v1/me` | F/G |
 
 ## Errors
 

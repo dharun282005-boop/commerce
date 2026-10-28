@@ -4,3 +4,6 @@
 docs
 coverage
 **/test
+**/.next
+**/test-results
+**/playwright-report

@@ -2,7 +2,22 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['**/node_modules/**', '**/dist/**', '**/.next/**', 'coverage/**'] },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.next/**',
+      'coverage/**',
+      '**/test-results/**',
+      '**/next-env.d.ts',
+    ],
+  },
+  {
+    files: ['apps/web/public/sw.js'],
+    languageOptions: {
+      globals: { self: 'readonly', caches: 'readonly', URL: 'readonly', fetch: 'readonly' },
+    },
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

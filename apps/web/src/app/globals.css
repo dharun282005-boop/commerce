@@ -1,0 +1,96 @@
+@import 'tailwindcss';
+
+/* Design tokens. Light by default; dark from the system setting. Chart tokens follow the
+   dataviz reference palette (series-1 blue), validated for both surfaces. */
+:root {
+  --bg: #f6f6f4;
+  --surface: #fcfcfb;
+  --surface-2: #f0efec;
+  --border: #dddcd7;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --text-3: #6b6a65;
+  --accent: #1c5cab;
+  --accent-fg: #ffffff;
+  --series-1: #2a78d6;
+  --grid: #e6e5e0;
+  --warn-bg: #fff4d6;
+  --warn-fg: #6b4500;
+  --bad-bg: #fde8e8;
+  --bad-fg: #8a1c1c;
+  --ok-fg: #0a6b0a;
+  --sample-bg: #e8f0fb;
+  --sample-fg: #134479;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121211;
+    --surface: #1a1a19;
+    --surface-2: #242422;
+    --border: #383835;
+    --text: #f0efec;
+    --text-2: #c3c2b7;
+    --text-3: #a3a29a;
+    --accent: #86b6ef;
+    --accent-fg: #0b0b0b;
+    --series-1: #3987e5;
+    --grid: #2c2c2a;
+    --warn-bg: #3a2c05;
+    --warn-fg: #f6d58a;
+    --bad-bg: #3d1414;
+    --bad-fg: #f5b3b3;
+    --ok-fg: #7ad67a;
+    --sample-bg: #16263b;
+    --sample-fg: #b7d3f6;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-ink-3: var(--text-3);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-fg: var(--warn-fg);
+  --color-bad-bg: var(--bad-bg);
+  --color-bad-fg: var(--bad-fg);
+  --color-ok: var(--ok-fg);
+  --color-sample-bg: var(--sample-bg);
+  --color-sample-fg: var(--sample-fg);
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  background: var(--bg);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    'Noto Sans Tamil',
+    'Noto Sans',
+    sans-serif;
+  line-height: 1.5;
+}
+:lang(ta) body {
+  line-height: 1.7;
+}
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
