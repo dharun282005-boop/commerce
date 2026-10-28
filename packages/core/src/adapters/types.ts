@@ -47,12 +47,7 @@ export interface SourceAdapter {
 }
 
 export type SourceErrorKind =
-  | 'disabled'
-  | 'rate_limited'
-  | 'circuit_open'
-  | 'timeout'
-  | 'upstream_error'
-  | 'invalid_data';
+  'disabled' | 'rate_limited' | 'circuit_open' | 'timeout' | 'upstream_error' | 'invalid_data';
 
 export class SourceError extends Error {
   constructor(

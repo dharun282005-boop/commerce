@@ -9,7 +9,13 @@ import { GROCERY_PLATFORMS, GROCERY_PRODUCTS } from '../fixtures/grocery.ts';
 import { PROPERTY_LISTINGS } from '../fixtures/property.ts';
 import { SHOPPING_ITEMS } from '../fixtures/shopping.ts';
 import { FIXTURE_SOURCES, type FixtureSourceDef } from '../fixtures/sources.ts';
-import { SourceError, type Compliance, type RawOffer, type SearchContext, type SourceAdapter } from './types.ts';
+import {
+  SourceError,
+  type Compliance,
+  type RawOffer,
+  type SearchContext,
+  type SourceAdapter,
+} from './types.ts';
 
 /** A fixture record: the canonical offer minus provenance, plus text to search and where it delivers. */
 interface FixtureRecord {
@@ -36,7 +42,13 @@ const pincodesFor = (ids: string[]) => [...new Set(ids.map((id) => localityById.
 const allPincodes = [...new Set(LOCALITIES.map((l) => l.pincode))];
 const r = rupeesToPaise;
 
-const noFees = { deliveryPaise: null, handlingPaise: null, platformPaise: null, packagingPaise: null, taxesNotIncludedPaise: null };
+const noFees = {
+  deliveryPaise: null,
+  handlingPaise: null,
+  platformPaise: null,
+  packagingPaise: null,
+  taxesNotIncludedPaise: null,
+};
 
 /** Deterministic pseudo-age between 1 and `max` minutes, so tests are stable. */
 function ageFor(id: string, max: number): number {
@@ -117,7 +129,9 @@ export class FixtureAdapter implements SourceAdapter {
     if (this.opts.fail === 'error') throw new SourceError('upstream_error', 'simulated upstream error', true);
     if (this.opts.fail === 'timeout') {
       // Never resolves on its own; the wrapper's timeout aborts it.
-      await new Promise<void>((_, reject) => ctx.signal?.addEventListener('abort', () => reject(new Error('aborted'))));
+      await new Promise<void>((_, reject) =>
+        ctx.signal?.addEventListener('abort', () => reject(new Error('aborted'))),
+      );
     }
     if (this.opts.latencyMs) await new Promise((res) => setTimeout(res, this.opts.latencyMs));
   }
@@ -142,11 +156,31 @@ function buildRecords(def: FixtureSourceDef): FixtureRecord[] {
           url: def.searchUrl(l.title),
           pricePaise: r(l.price),
           mrpPaise: l.mrp === null ? null : r(l.mrp),
-          fees: { ...noFees, deliveryPaise: l.delivery === null ? null : r(l.delivery), platformPaise: 0, handlingPaise: 0, packagingPaise: 0, taxesNotIncludedPaise: 0 },
-          coupons: l.coupon ? [{ code: l.coupon.code, description: l.coupon.description, savingPaise: r(l.coupon.saving), verifiable: l.coupon.verifiable }] : [],
+          fees: {
+            ...noFees,
+            deliveryPaise: l.delivery === null ? null : r(l.delivery),
+            platformPaise: 0,
+            handlingPaise: 0,
+            packagingPaise: 0,
+            taxesNotIncludedPaise: 0,
+          },
+          coupons: l.coupon
+            ? [
+                {
+                  code: l.coupon.code,
+                  description: l.coupon.description,
+                  savingPaise: r(l.coupon.saving),
+                  verifiable: l.coupon.verifiable,
+                },
+              ]
+            : [],
           rating: l.rating ? { average: l.rating[0], count: l.rating[1] } : null,
           etaMinutes: l.eta,
-          trust: { fulfilledByPlatform: l.fulfilled, returnPolicyDays: l.returnDays, sellerRating: l.sellerRating },
+          trust: {
+            fulfilledByPlatform: l.fulfilled,
+            returnPolicyDays: l.returnDays,
+            sellerRating: l.sellerRating,
+          },
           affiliate: l.affiliate ?? false,
           brand: item.brand,
           model: item.model,
@@ -185,8 +219,19 @@ function buildRecords(def: FixtureSourceDef): FixtureRecord[] {
             packagingPaise: l.packaging === null ? null : r(l.packaging),
             taxesNotIncludedPaise: Math.round(r(l.price) * 0.05), // 5% GST on restaurant food
           },
-          coupons: l.coupon ? [{ code: l.coupon.code, description: l.coupon.description, savingPaise: r(l.coupon.saving), verifiable: l.coupon.verifiable }] : [],
-          rating: l.restaurantRating ? { average: l.restaurantRating[0], count: l.restaurantRating[1] } : null,
+          coupons: l.coupon
+            ? [
+                {
+                  code: l.coupon.code,
+                  description: l.coupon.description,
+                  savingPaise: r(l.coupon.saving),
+                  verifiable: l.coupon.verifiable,
+                },
+              ]
+            : [],
+          rating: l.restaurantRating
+            ? { average: l.restaurantRating[0], count: l.restaurantRating[1] }
+            : null,
           etaMinutes: l.eta,
           trust: { fulfilledByPlatform: null, returnPolicyDays: null, sellerRating: null },
           affiliate: false,
@@ -194,7 +239,9 @@ function buildRecords(def: FixtureSourceDef): FixtureRecord[] {
             id: rest.id,
             name: rest.name,
             localityId: rest.localityId,
-            rating: l.restaurantRating ? { average: l.restaurantRating[0], count: l.restaurantRating[1] } : null,
+            rating: l.restaurantRating
+              ? { average: l.restaurantRating[0], count: l.restaurantRating[1] }
+              : null,
           },
           dish: d.dish,
           servings: d.servings,
@@ -306,14 +353,19 @@ function buildRecords(def: FixtureSourceDef): FixtureRecord[] {
 /** Parses FIXTURE_FAIL like "fixture-zomato:timeout,fixture-croma:error". */
 export function parseFixtureFailures(spec: string | undefined): Map<string, FixtureFailure> {
   const m = new Map<string, FixtureFailure>();
-  for (const part of (spec ?? '').split(',').map((s) => s.trim()).filter(Boolean)) {
+  for (const part of (spec ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)) {
     const [id, kind] = part.split(':');
     if (id && (kind === 'timeout' || kind === 'error')) m.set(id, kind);
   }
   return m;
 }
 
-export function createFixtureAdapters(opts: { failures?: Map<string, FixtureFailure>; latencyMs?: number } = {}) {
+export function createFixtureAdapters(
+  opts: { failures?: Map<string, FixtureFailure>; latencyMs?: number } = {},
+) {
   return FIXTURE_SOURCES.map(
     (def) => new FixtureAdapter(def, { fail: opts.failures?.get(def.id) ?? null, latencyMs: opts.latencyMs }),
   );

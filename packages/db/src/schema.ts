@@ -21,7 +21,10 @@ export const localities = pgTable('localities', {
   lat: doublePrecision().notNull(),
   lng: doublePrecision().notNull(),
   zone: text().notNull(),
-  aliases: text().array().notNull().default(sql`'{}'::text[]`),
+  aliases: text()
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
 });
 
 export const sources = pgTable('sources', {

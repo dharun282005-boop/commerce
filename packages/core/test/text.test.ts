@@ -8,7 +8,11 @@ describe('text', () => {
   });
   it('drops request words, bare numbers and locality names from queries', () => {
     expect(queryTokens('Best price for Samsung Galaxy S24 FE 128GB delivered to Velachery')).toEqual([
-      'samsung', 'galaxy', 's24', 'fe', '128gb',
+      'samsung',
+      'galaxy',
+      's24',
+      'fe',
+      '128gb',
     ]);
     expect(queryTokens('12 eggs')).toEqual(['egg']);
   });

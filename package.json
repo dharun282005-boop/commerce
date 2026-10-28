@@ -3,8 +3,13 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "engines": { "node": ">=24 <25" },
-  "workspaces": ["packages/*", "apps/*"],
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev:api": "npm run dev -w @cuc/api",
     "db:migrate": "npm run migrate -w @cuc/db",

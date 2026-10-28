@@ -10,7 +10,8 @@ const STOPWORDS = new Set(
 );
 
 for (const l of LOCALITIES) for (const w of tokenizeRaw(l.name)) STOPWORDS.add(w);
-for (const c of Object.values(CORRIDORS)) for (const a of c.aliases) for (const w of tokenizeRaw(a)) STOPWORDS.add(w);
+for (const c of Object.values(CORRIDORS))
+  for (const a of c.aliases) for (const w of tokenizeRaw(a)) STOPWORDS.add(w);
 
 function tokenizeRaw(text: string): string[] {
   return text

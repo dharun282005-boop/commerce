@@ -23,7 +23,10 @@ export function assertPaise(value: number): Paise {
 const formatters = new Map<string, Intl.NumberFormat>();
 
 /** Formats with Indian digit grouping, e.g. 12345678 paise -> "₹1,23,456.78". */
-export function formatINR(paise: Paise, opts: { locale?: 'en-IN' | 'ta-IN'; showPaise?: boolean } = {}): string {
+export function formatINR(
+  paise: Paise,
+  opts: { locale?: 'en-IN' | 'ta-IN'; showPaise?: boolean } = {},
+): string {
   const locale = opts.locale ?? 'en-IN';
   const showPaise = opts.showPaise ?? paise % 100 !== 0;
   const key = `${locale}:${showPaise}`;

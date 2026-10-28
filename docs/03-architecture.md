@@ -74,4 +74,4 @@ Details live in [DECISIONS.md](DECISIONS.md).
 ## Runtime topology (local)
 
 `docker compose up` starts `postgres` (pgvector/pgvector:pg17), `redis` (redis:8-alpine) and `api`.
-The `api` container runs migrations and seeds on start, then listens on port 4000.
+The `api` container runs migrations and seeds on start, then listens on port 4100.

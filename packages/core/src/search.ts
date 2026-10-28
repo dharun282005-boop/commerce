@@ -14,7 +14,11 @@ export interface SearchOutcome {
  *
  * Phase B: offers are filtered and sorted by item price only. Ranking arrives in Phase C.
  */
-export async function searchAll(sources: GuardedAdapter[], query: SearchQuery, ctx: SearchContext): Promise<SearchOutcome> {
+export async function searchAll(
+  sources: GuardedAdapter[],
+  query: SearchQuery,
+  ctx: SearchContext,
+): Promise<SearchOutcome> {
   const relevant = sources.filter((s) => s.adapter.capabilities.verticals.includes(query.vertical));
   const settled = await Promise.allSettled(relevant.map((s) => s.search(query, ctx)));
 
@@ -46,7 +50,8 @@ export async function searchAll(sources: GuardedAdapter[], query: SearchQuery, c
 /** Filters apply the same way to every source. `maxPricePaise` checks item price until landed cost exists (Phase C). */
 export function passesFilters(o: Offer, f: SearchFilters): boolean {
   if (f.maxPricePaise !== undefined && o.pricePaise > f.maxPricePaise) return false;
-  if (f.maxEtaMinutes !== undefined && (o.etaMinutes === null || o.etaMinutes > f.maxEtaMinutes)) return false;
+  if (f.maxEtaMinutes !== undefined && (o.etaMinutes === null || o.etaMinutes > f.maxEtaMinutes))
+    return false;
   if (o.vertical === 'food') {
     if (f.vegOnly && !o.isVeg) return false;
     if (f.minServings !== undefined && o.servings < f.minServings) return false;

@@ -48,7 +48,9 @@ describe('compliance gate and kill switches', () => {
 
   it('kill switch wins over ENABLED_SOURCES', () => {
     const a = new FakeAdapter([], 'a');
-    expect(checkAllowed(a, policyFromEnv({ ENABLED_SOURCES: 'a', DISABLED_SOURCES: 'a' })).allowed).toBe(false);
+    expect(checkAllowed(a, policyFromEnv({ ENABLED_SOURCES: 'a', DISABLED_SOURCES: 'a' })).allowed).toBe(
+      false,
+    );
   });
 
   it('a tier-4 source without robots.txt permission stays off even if enabled', () => {

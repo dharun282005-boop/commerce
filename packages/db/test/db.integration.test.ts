@@ -15,7 +15,9 @@ afterAll(async () => {
 
 describe('database (needs docker compose up -d postgres)', () => {
   it('has pg_trgm and pgvector enabled', async () => {
-    const { rows } = await pool.query("select extname from pg_extension where extname in ('pg_trgm','vector') order by 1");
+    const { rows } = await pool.query(
+      "select extname from pg_extension where extname in ('pg_trgm','vector') order by 1",
+    );
     expect(rows.map((r) => r.extname)).toEqual(['pg_trgm', 'vector']);
   });
 

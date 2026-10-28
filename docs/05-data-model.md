@@ -37,7 +37,7 @@ Two layers: the **canonical offer** (TypeScript + Zod, in `packages/core/src/sch
 |----------|--------|
 | shopping | `brand, model, variant { storageGb, ramGb, colour, size }, identifiers { gtin, asin, mpn, modelNumber }, category, seller` |
 | food | `restaurant { id, name, locality, rating }, dish, servings, isVeg, dietaryTags[], deliversTo[] (pincodes)` |
-| grocery | `brand, product, quantity { value, unit: g\|ml\|pc }, packCount, category, deliversTo[] (pincodes), minOrderPaise` |
+| grocery | `brand, product, quantity { value, unit: g\|ml\|pc }, packCount, category, deliversTo[] (pincodes), order { minOrderPaise, freeDeliveryAbovePaise }`. Grocery `fees` are **per order**, not per item. |
 | property | `listingType rent\|buy, bhk, areaSqft, depositPaise, furnishing, floor, totalFloors, ageYears, localityId, pincode, geo { lat, lng }, amenities[], postedBy owner\|broker, postedAt, photoCount, nearTransit[]` |
 
 There is deliberately **no phone number field** on property listings (FR-PRP-03).

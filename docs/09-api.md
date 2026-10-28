@@ -1,12 +1,12 @@
 # 09 · API
 
-Base URL (local): `http://localhost:4000`. OpenAPI UI: `/docs`. JSON spec: `/docs/json`.
+Base URL (local): `http://localhost:4100`. OpenAPI UI: `/docs`. JSON spec: `/docs/json`.
 All bodies are validated with Zod. Every response has an `x-request-id` header.
 
 ## Phase B endpoints (implemented)
 
 ### `GET /health`
-Liveness and dependency status: `{ status: "ok", db: "up"|"down"|"disabled", redis: "up"|"down"|"disabled", fixtureMode: true }`.
+Liveness and dependency status (the Docker health check uses it): `{ status: "ok", db: "up"|"down"|"disabled", redis: "up"|"down"|"disabled", fixtureMode: true }`.
 
 ### `GET /metrics`
 Plain-text counters in Prometheus text format: requests, searches per vertical, source results by
@@ -50,8 +50,9 @@ Response:
 }
 ```
 
-In Phase B, offers are filtered but **not yet ranked**. Ranking and the `ranking` block arrive in
-Phase C.
+In Phase B, offers are filtered and sorted by **item price only**. They are not yet ranked, and
+`maxPricePaise` checks item price, not landed cost. Ranking, landed cost and anomaly flags arrive in
+Phase C. This is why the deliberate "too cheap" trap listings sort first for now.
 
 ## Planned endpoints
 

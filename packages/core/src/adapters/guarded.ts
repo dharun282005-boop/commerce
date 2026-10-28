@@ -25,7 +25,11 @@ export interface SourcePolicy {
   enabled: ReadonlySet<string>;
 }
 
-export function policyFromEnv(env: Record<string, string | undefined>): SourcePolicy {
+export function policyFromEnv(env: {
+  KILL_SWITCH_ALL?: string;
+  DISABLED_SOURCES?: string;
+  ENABLED_SOURCES?: string;
+}): SourcePolicy {
   const list = (v: string | undefined) =>
     new Set(
       (v ?? '')
@@ -41,7 +45,10 @@ export function policyFromEnv(env: Record<string, string | undefined>): SourcePo
 }
 
 /** The compliance gate. Order matters: kill switches win over everything. */
-export function checkAllowed(adapter: SourceAdapter, policy: SourcePolicy): { allowed: boolean; reason: string } {
+export function checkAllowed(
+  adapter: SourceAdapter,
+  policy: SourcePolicy,
+): { allowed: boolean; reason: string } {
   const c = adapter.compliance;
   if (policy.killAll) return { allowed: false, reason: 'global kill switch is on' };
   if (policy.disabled.has(adapter.id)) return { allowed: false, reason: 'source switched off' };
@@ -147,19 +154,28 @@ export class GuardedAdapter {
     const cached = await this.safeCacheGet(key);
     if (cached) {
       this.opts.onEvent?.({ type: 'cache_hit', sourceId: this.adapter.id });
-      return finish({ status: 'ok', offers: cached.offers, fromCache: true, fetchedAt: cached.fetchedAt, droppedInvalid: 0 });
+      return finish({
+        status: 'ok',
+        offers: cached.offers,
+        fromCache: true,
+        fetchedAt: cached.fetchedAt,
+        droppedInvalid: 0,
+      });
     }
     this.opts.onEvent?.({ type: 'cache_miss', sourceId: this.adapter.id });
 
     try {
       // 3. Rate limit and 4. circuit breaker
       if (!this.bucket.tryTake()) throw new SourceError('rate_limited', 'per-source rate limit reached');
-      if (!this.breaker.canRequest()) throw new SourceError('circuit_open', 'source is cooling down after failures');
+      if (!this.breaker.canRequest())
+        throw new SourceError('circuit_open', 'source is cooling down after failures');
 
       // 5. Timeout + retry with jitter
       let raws;
       try {
-        raws = await this.withRetry(() => this.withTimeout((signal) => this.adapter.search(query, { ...ctx, signal })));
+        raws = await this.withRetry(() =>
+          this.withTimeout((signal) => this.adapter.search(query, { ...ctx, signal })),
+        );
         this.breaker.onSuccess();
       } catch (err) {
         this.breaker.onFailure();
@@ -184,7 +200,9 @@ export class GuardedAdapter {
       return finish({ status: 'ok', offers, fromCache: false, fetchedAt, droppedInvalid: dropped });
     } catch (err) {
       const e =
-        err instanceof SourceError ? err : new SourceError('upstream_error', err instanceof Error ? err.message : String(err));
+        err instanceof SourceError
+          ? err
+          : new SourceError('upstream_error', err instanceof Error ? err.message : String(err));
       this.lastErrorAt = this.clock();
       this.lastError = `${e.kind}: ${e.message}`;
       return finish({
@@ -269,7 +287,9 @@ export class GuardedAdapter {
 /** Filters are applied after fetching, so they are not part of the key. */
 export function cacheKey(sourceId: string, q: SearchQuery): string {
   const h = createHash('sha256')
-    .update(JSON.stringify([q.vertical, q.q.toLowerCase(), [...q.pincodes].sort(), [...q.localityIds].sort()]))
+    .update(
+      JSON.stringify([q.vertical, q.q.toLowerCase(), [...q.pincodes].sort(), [...q.localityIds].sort()]),
+    )
     .digest('hex')
     .slice(0, 24);
   return `search:v1:${sourceId}:${h}`;

@@ -10,11 +10,22 @@ import { ctx } from './helpers.ts';
 function guarded(env: Record<string, string> = {}) {
   const failures = parseFixtureFailures(env.FIXTURE_FAIL);
   return createFixtureAdapters({ failures }).map(
-    (a) => new GuardedAdapter(a, { policy: policyFromEnv(env), cache: new MemoryCache(), timeoutMs: 50, retries: 0 }),
+    (a) =>
+      new GuardedAdapter(a, {
+        policy: policyFromEnv(env),
+        cache: new MemoryCache(),
+        timeoutMs: 50,
+        retries: 0,
+      }),
   );
 }
 
-function q(vertical: SearchQuery['vertical'], text: string, area: string, filters: SearchFilters = {}): SearchQuery {
+function q(
+  vertical: SearchQuery['vertical'],
+  text: string,
+  area: string,
+  filters: SearchFilters = {},
+): SearchQuery {
   const a = resolveArea(area)!;
   return { vertical, q: text, pincodes: a.pincodes, localityIds: a.localities.map((l) => l.id), filters };
 }
@@ -34,7 +45,12 @@ describe('fixture data: headline user stories', () => {
   it('US-2: veg biryani for 2 under ₹300 within 40 min in Adyar', async () => {
     const out = await searchAll(
       guarded(),
-      q('food', 'veg biryani', 'Adyar', { vegOnly: true, minServings: 2, maxPricePaise: 30000, maxEtaMinutes: 40 }),
+      q('food', 'veg biryani', 'Adyar', {
+        vegOnly: true,
+        minServings: 2,
+        maxPricePaise: 30000,
+        maxEtaMinutes: 40,
+      }),
       ctx(),
     );
     expect(out.offers.length).toBeGreaterThanOrEqual(2);
@@ -57,7 +73,12 @@ describe('fixture data: headline user stories', () => {
   it('US-4: 2 BHK semi-furnished rentals in the OMR corridor up to ₹30,000', async () => {
     const out = await searchAll(
       guarded(),
-      q('property', '2 BHK', 'OMR', { bhk: 2, listingType: 'rent', furnishing: 'semi-furnished', maxPricePaise: 3_000_000 }),
+      q('property', '2 BHK', 'OMR', {
+        bhk: 2,
+        listingType: 'rent',
+        furnishing: 'semi-furnished',
+        maxPricePaise: 3_000_000,
+      }),
       ctx(),
     );
     expect(out.offers.length).toBeGreaterThanOrEqual(5);
@@ -72,7 +93,12 @@ describe('fixture data: headline user stories', () => {
 
 describe('fixture data: honesty rules', () => {
   it('every offer is labelled as sample data with source and timestamp', async () => {
-    for (const [v, text, area] of [['shopping', 'phone', 'Adyar'], ['food', 'biryani', 'Adyar'], ['grocery', 'milk', 'Adyar'], ['property', 'bhk', 'OMR']] as const) {
+    for (const [v, text, area] of [
+      ['shopping', 'phone', 'Adyar'],
+      ['food', 'biryani', 'Adyar'],
+      ['grocery', 'milk', 'Adyar'],
+      ['property', 'bhk', 'OMR'],
+    ] as const) {
       const out = await searchAll(guarded(), q(v, text, area), ctx());
       expect(out.offers.length, v).toBeGreaterThan(0);
       for (const o of out.offers) {

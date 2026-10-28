@@ -40,7 +40,7 @@ services:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://localhost:4100/health']
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4100/health']
       interval: 5s
       timeout: 3s
       retries: 20

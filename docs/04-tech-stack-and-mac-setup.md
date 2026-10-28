@@ -61,7 +61,8 @@ cp .env.example .env              # nothing secret is needed for fixture mode
 npm install
 
 # 3. Run everything in Docker
-docker compose up --build         # postgres + redis + api on http://localhost:4000
+docker compose up --build         # postgres + redis + api on http://localhost:4100
+                                  # (port 4100 because 4000 was already in use on the owner's Mac)
 
 # or run the API on the host with only the databases in Docker
 docker compose up -d postgres redis
@@ -72,4 +73,4 @@ npm run dev:api
 npm run ci                        # lint + typecheck + tests
 ```
 
-The OpenAPI UI is at http://localhost:4000/docs.
+The OpenAPI UI is at http://localhost:4100/docs.

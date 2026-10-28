@@ -20,7 +20,13 @@ describe('localities', () => {
   });
   it('resolves the OMR corridor to several localities', () => {
     const omr = resolveArea('OMR');
-    expect(omr?.localities.map((l) => l.id)).toEqual(['perungudi', 'thoraipakkam', 'karapakkam', 'sholinganallur', 'navalur']);
+    expect(omr?.localities.map((l) => l.id)).toEqual([
+      'perungudi',
+      'thoraipakkam',
+      'karapakkam',
+      'sholinganallur',
+      'navalur',
+    ]);
     expect(omr?.pincodes).toContain('600119');
   });
   it('returns null for places outside the seeded list', () => {
