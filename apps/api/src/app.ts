@@ -29,6 +29,12 @@ import {
 import { z } from 'zod';
 import type { Config } from './config.ts';
 import { Metrics } from './metrics.ts';
+import { randomBytes } from 'node:crypto';
+import fastifyCors from '@fastify/cors';
+import { AlertService } from './alerts/service.ts';
+import { MemoryAlertStore, type AlertStore } from './alerts/store.ts';
+import { MemoryNotifier, SmtpNotifier, type Notifier } from './alerts/notify.ts';
+import { alertRoutes } from './routes/alerts.ts';
 import { coreRoutes } from './routes/core.ts';
 import { dataRoutes } from './routes/data.ts';
 import { agentRoutes } from './routes/agent.ts';
@@ -49,6 +55,8 @@ export interface AppDeps {
   adapters?: SourceAdapter[];
   now?: () => Date;
   submissionStore?: SubmissionStore;
+  alertStore?: AlertStore;
+  notifier?: Notifier;
   /** Agent model; default: Claude if ANTHROPIC_MODEL + credentials are set, else the offline planner. */
   agentModel?: AgentModel;
   agentLimits?: Partial<AgentLimits>;
@@ -95,6 +103,15 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       route: req.routeOptions.url ?? 'unknown',
       status: String(reply.statusCode),
     });
+  });
+
+  // The web app runs on its own origin; only it may call the API from a browser.
+  await app.register(fastifyCors, {
+    origin: config.WEB_ORIGIN.split(',').map((o) => o.trim()),
+    methods: ['GET', 'POST', 'DELETE'],
+    allowedHeaders: ['content-type', 'authorization', 'x-request-id'],
+    exposedHeaders: ['x-request-id'],
+    maxAge: 600,
   });
 
   await app.register(fastifySwagger, {
@@ -148,12 +165,26 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       }),
   );
 
+  if (!config.ALERT_SECRET && config.NODE_ENV === 'production') {
+    app.log.warn('ALERT_SECRET is not set: alert links will stop working after a restart');
+  }
+  const notifier =
+    deps.notifier ?? (config.SMTP_URL ? new SmtpNotifier(config.SMTP_URL) : new MemoryNotifier());
+  const alerts = new AlertService({
+    store: deps.alertStore ?? new MemoryAlertStore(),
+    notifier,
+    secret: config.ALERT_SECRET ?? randomBytes(32).toString('hex'),
+    webOrigin: config.WEB_ORIGIN.split(',')[0]!.trim(),
+    now,
+  });
+
   const services = createServices({
     sources: guarded,
     history: deps.history,
     recordObservations: deps.recordObservations,
     now,
     onWarn: (msg, err) => app.log.warn({ err }, msg),
+    onObserved: (offers) => alerts.check(offers),
   });
 
   app.get(
@@ -198,6 +229,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   await app.register(coreRoutes, { services, metrics });
   await app.register(dataRoutes, { importer, userSubmitted, config, now, metrics });
+  await app.register(alertRoutes, { alerts, services });
   const agentModel = deps.agentModel ?? claudeFromEnv() ?? new ScriptedModel();
   await app.register(agentRoutes, { services, metrics, model: agentModel, now, limits: deps.agentLimits });
   for (const plugin of deps.plugins ?? []) await plugin(app, { services, metrics });

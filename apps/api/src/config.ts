@@ -30,6 +30,15 @@ const Env = z.object({
     .string()
     .optional()
     .transform((v) => v || undefined),
+  ALERT_SECRET: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
+  SMTP_URL: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
+  WEB_ORIGIN: z.string().default('http://localhost:3100'),
 });
 export type Config = z.infer<typeof Env>;
 

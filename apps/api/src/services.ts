@@ -91,6 +91,8 @@ export interface ServiceDeps {
   recordObservations?: (offers: Offer[]) => Promise<unknown>;
   now: () => Date;
   onWarn?: (msg: string, err: unknown) => void;
+  /** Called with freshly fetched offers (e.g. to check price alerts). */
+  onObserved?: (offers: Offer[]) => Promise<unknown>;
 }
 
 export function createServices(deps: ServiceDeps): Services {
@@ -113,12 +115,12 @@ export function createServices(deps: ServiceDeps): Services {
 
   const record = (outcome: SearchOutcome) => {
     for (const o of outcome.offers) lastSeen.set(o.id, o);
-    if (!deps.recordObservations) return;
     const fresh = new Set(
       outcome.sources.filter((s) => s.status === 'ok' && !s.fromCache).map((s) => s.sourceId),
     );
     const toRecord = outcome.offers.filter((o) => fresh.has(o.provenance.sourceId));
-    deps.recordObservations(toRecord).catch((err) => deps.onWarn?.('failed to record observations', err));
+    deps.recordObservations?.(toRecord).catch((err) => deps.onWarn?.('failed to record observations', err));
+    deps.onObserved?.(toRecord).catch((err) => deps.onWarn?.('failed to check alerts', err));
   };
 
   const areaOf = (locality: string) => {

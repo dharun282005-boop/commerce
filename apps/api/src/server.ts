@@ -4,6 +4,7 @@ import { Redis } from 'ioredis';
 import { buildApp, type AppDeps } from './app.ts';
 import { loadConfig } from './config.ts';
 import { RedisCache } from './redis-cache.ts';
+import { PgAlertStore } from './alerts/store.ts';
 
 const config = loadConfig();
 // Default folder for owner-supplied data files (tier 3).
@@ -29,6 +30,7 @@ if (config.DATABASE_URL) {
   const store = new ObservationStore(db);
   deps.recordObservations = (offers) => store.record(offers);
   deps.history = new PgHistoryStore(pool);
+  deps.alertStore = new PgAlertStore(pool);
   deps.pingDb = async () => (await pool.query('select 1')).rowCount === 1;
   closers.push(() => pool.end());
 }
