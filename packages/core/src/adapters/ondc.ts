@@ -16,7 +16,7 @@ import {
  * Tier 2: ONDC buyer-side search over the Beckn protocol, retail grocery domain (ONDC:RET10).
  *
  * Real ONDC is ASYNCHRONOUS and SIGNED: the buyer app sends a signed `search` to a gateway and
- * sellers call back the buyer app's `/on_search` endpoint. That needs registry onboarding (docs/06).
+ * sellers call back the buyer app's `/on_search` endpoint. That needs registry onboarding.
  * This client implements the request/response shapes against a MOCK gateway that answers
  * `on_search` synchronously. Field names follow the ONDC retail v1.2 contract [VERIFY in Phase D review].
  * Only `search` is implemented: never `select`, `init` or `confirm` (rule 2: no purchases).

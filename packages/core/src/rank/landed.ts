@@ -19,7 +19,7 @@ export interface LandedCost {
 
 /**
  * Total landed cost = item + delivery + handling + platform + packaging + taxes not included
- * − verifiable coupons (docs/07 §1). Grocery fees are per order: here they are applied as if this
+ * − verifiable coupons. Grocery fees are per order: here they are applied as if this
  * item were the whole order, with the free-delivery threshold respected.
  * Property: the monthly rent or sale price only (the deposit is shown separately).
  */

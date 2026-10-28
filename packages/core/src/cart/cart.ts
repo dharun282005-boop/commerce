@@ -138,7 +138,7 @@ export interface CartPlan {
 }
 
 /**
- * Greedy + local search (docs/07 §5), restarted from several starting points:
+ * Greedy + local search, restarted from several starting points:
  *  1. start from "each need on its cheapest platform", and from "everything on platform P" for each P;
  *  2. from each start, repeat until nothing improves: move one need to another platform, or close a
  *     platform by moving all its needs to their best alternative (platforms in use first, else any);

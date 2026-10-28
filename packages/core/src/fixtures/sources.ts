@@ -3,7 +3,7 @@ import type { Vertical } from '../schemas.ts';
 /**
  * Sample sources. Each copies the *name* of a real platform so comparisons look realistic,
  * but all data is made up and labelled "(sample)". The real platform's Terms URL is recorded
- * for the compliance review in docs/06. Deep links go to the platform's public search page.
+ * for compliance review. Deep links go to the platform's public search page.
  * [VERIFY] The Terms URLs have not been opened yet. Check each one before any Phase D review.
  */
 export interface FixtureSourceDef {

@@ -46,7 +46,7 @@ async function all(vertical: SearchQuery['vertical'], q = '*', area?: string): P
   return out;
 }
 
-describe('landed cost (hand-computed, docs/07 §1)', () => {
+describe('landed cost (hand-computed)', () => {
   it('food example: 24,900 + 3,500 + 2,000 + 1,000 + 1,245 − 5,000 = 27,645 paise', async () => {
     const o = (await all('food', 'veg biryani')).find((x) => x.id === 'fixture-swiggy:mbh-veg-biryani-2')!;
     const l = landedCost(o);
@@ -81,7 +81,7 @@ describe('landed cost (hand-computed, docs/07 §1)', () => {
   });
 });
 
-describe('Bayesian rating (hand-computed, docs/07 §2)', () => {
+describe('Bayesian rating (hand-computed)', () => {
   it('4.9 from 3 ratings → 4.051; 4.5 from 5,000 → 4.495', () => {
     expect(bayesianRating(4.9, 3)).toBeCloseTo(214.7 / 53, 6);
     expect(bayesianRating(4.9, 3)).toBeCloseTo(4.051, 3);

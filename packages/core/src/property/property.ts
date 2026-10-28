@@ -20,7 +20,7 @@ export function haversineM(a: { lat: number; lng: number }, b: { lat: number; ln
 
 const within = (x: number, y: number, tol: number) => Math.abs(x - y) / Math.max(x, y) <= tol;
 
-/** docs/07 §6: same BHK and type, ≤ 50 m apart, area and price within 5%. */
+/** Same BHK and type, ≤ 50 m apart, area and price within 5%. */
 export function sameProperty(a: PropertyOffer, b: PropertyOffer): { same: boolean; reason: string } {
   if (a.bhk !== b.bhk || a.listingType !== b.listingType)
     return { same: false, reason: 'BHK or listing type differ' };

@@ -1,4 +1,3 @@
-import { writeFileSync } from 'node:fs';
 import { createFixtureAdapters } from '../src/adapters/fixture.ts';
 import { ALL_CHENNAI_PINCODES } from '../src/adapters/fixture.ts';
 import { LOCALITIES } from '../src/localities.ts';
@@ -170,7 +169,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   }
   md += `| **all** | **${all.pairs}** | ${all.positives} | ${all.tp} | ${all.fp} | ${all.fn} | ${all.tn} | ${all.possible} | **${fmt(all.precision)}** | **${fmt(all.recall)}** | **${fmt(all.f1)}** |\n\n`;
   md += `Hard negatives (pairs labelled different): ${pairs.filter((p) => p.hardNegative).length}.\n\n`;
-  md += `Targets (docs/01 §7): precision ≥ 0.95, recall ≥ 0.85.\n\n## Errors\n\n`;
+  md += `Targets: precision ≥ 0.95, recall ≥ 0.85.\n\n## Errors\n\n`;
   md +=
     all.errors.length === 0
       ? 'None.\n'
@@ -180,8 +179,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
               `- expected ${e.same ? 'same' : 'different'}, got **${e.got}**: "${e.a}" vs "${e.b}" (${e.reason})`,
           )
           .join('\n') + '\n';
-  md += `\n## Caveat\n\nThe fixture pairs come from data written for this project, and the matcher was developed alongside them. The held-out set (${HELDOUT_PAIRS.length} hand-written pairs, titles only) was meant as the fairer test, but the title rules (variant words, model codes, unit normalisation) were added **after** a first run on it. First run on 2026-10-29: held-out precision 0.714, recall 0.577 (6 false merges, e.g. iPhone 16 Pro vs Pro Max). So these held-out numbers are optimistic. A new, unseen set of real titles is needed for an honest number (listed in docs/15).\n`;
-  const out = new URL('../../../docs/progress/phase-C-eval.md', import.meta.url).pathname;
-  writeFileSync(out, md);
+  md += `\n## Caveat\n\nThe fixture pairs come from data written for this project, and the matcher was developed alongside them. The held-out set (${HELDOUT_PAIRS.length} hand-written pairs, titles only) was meant as the fairer test, but the title rules (variant words, model codes, unit normalisation) were added **after** a first run on it. First run on 2026-10-29: held-out precision 0.714, recall 0.577 (6 false merges, e.g. iPhone 16 Pro vs Pro Max). So these held-out numbers are optimistic. A new, unseen set of real titles is needed for an honest number.\n`;
   console.log(md);
 }

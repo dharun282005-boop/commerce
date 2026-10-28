@@ -25,5 +25,5 @@ for real prices you collected yourself.
 
 ## JSON (any vertical)
 
-An array of canonical offers (see docs/05) **without** `id` and `provenance`, plus optional
+An array of canonical offers (see `packages/core/src/schemas.ts`) **without** `id` and `provenance`, plus optional
 `externalId`, `isSample`, `observedAt`, `sourceName`. See `example-property.json`.

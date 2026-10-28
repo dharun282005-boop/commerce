@@ -81,7 +81,7 @@ function ratingOf(o: Offer): { average: number; count: number } | null {
 }
 
 /**
- * Transparent best-value score (docs/07 §3). `affiliate` is deliberately never read here,
+ * Transparent best-value score. `affiliate` is deliberately never read here,
  * so it cannot change the order (FR-RNK-05).
  *
  * Offers flagged as a price anomaly or carrying suspicious text keep their score (so the

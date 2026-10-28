@@ -8,8 +8,8 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const API = process.env.NEXT_PUBLIC_API_URL || '';
 const dev = process.env.NODE_ENV !== 'production';
 
-// Content Security Policy (brief §9). Next.js App Router injects small inline scripts, so
-// script-src needs 'unsafe-inline' unless a per-request nonce is used (see docs/10, docs/15).
+// Next.js App Router injects small inline scripts, so script-src needs 'unsafe-inline'
+// unless a per-request nonce is used.
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ''}`,

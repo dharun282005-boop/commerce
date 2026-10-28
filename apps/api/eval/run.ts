@@ -1,4 +1,3 @@
-import { writeFileSync } from 'node:fs';
 import type { FastifyInstance } from 'fastify';
 import { buildApp } from '../src/app.ts';
 import { claudeFromEnv, type AgentModel } from '../src/agent/models.ts';
@@ -153,8 +152,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     { i: 0, o: 0, c: 0 },
   );
   if (model.live) md += `\nTokens: input ${usage.i}, output ${usage.o}, cache reads ${usage.c}.\n`;
-  const out = new URL('../../../docs/progress/phase-E-eval.md', import.meta.url).pathname;
-  writeFileSync(out, md);
   console.log(md);
   process.exit(failed.length ? 1 : 0);
 }

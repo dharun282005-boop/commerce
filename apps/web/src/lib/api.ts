@@ -1,4 +1,4 @@
-/** Thin typed client for the API. Types mirror the API responses (docs/09). */
+/** Thin typed client for the API. */
 /** Same-origin /api by default (embedded API, e.g. on Vercel); set NEXT_PUBLIC_API_URL to use a separate API. */
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 

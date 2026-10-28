@@ -1,6 +1,6 @@
 /**
- * Seeded Chennai localities. Coordinates are approximate centroids and Tamil names
- * still need checking by a native reader: both are listed in docs/15-open-questions.md.
+ * Seeded Chennai localities. Coordinates are approximate centroids; Tamil names
+ * still need checking by a native reader.
  */
 export interface Locality {
   id: string;

@@ -1,5 +1,5 @@
 /**
- * Bayesian-adjusted rating (docs/07 §2): R* = (C·m + n·r̄) / (C + n).
+ * Bayesian-adjusted rating: R* = (C·m + n·r̄) / (C + n).
  * m = prior mean, C = how many ratings it takes before we trust the source's average.
  */
 export interface RatingPrior {

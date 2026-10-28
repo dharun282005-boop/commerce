@@ -1,6 +1,6 @@
 # PROMPT: "Chennai Universal Commerce" (comparison site + AI agent)
 
-> This is the owner's original project brief, saved verbatim so every phase can refer back to it.
+> This is the owner's original project brief.
 > Owner decision on 2026-10-28: **"for now use dummy datasets or customised datas"**, so all real
 > sources stay disabled and the project runs on fixture (sample) data until the owner says otherwise.
 
@@ -8,7 +8,7 @@
 
 You are a senior staff engineer and product architect. Build "Chennai Universal Commerce": a web app plus an AI shopping agent that helps people in Chennai, India find the best deal across e-commerce, food delivery, quick-commerce/grocery and property listings, by comparing price, rating, delivery cost/time and trust across platforms.
 
-The owner is a student who will also use the project to learn. So every phase must produce documentation explaining what was built and why (see "Documentation").
+The owner is a student who will also use the project to learn, so prefer clear, maintainable implementations.
 
 # THE PRODUCT
 
@@ -42,11 +42,11 @@ Chennai specifics: choose location by pincode or locality (T Nagar, Adyar, Anna 
 4. PROMPT-INJECTION SAFETY. Text from scraped pages, listings and reviews is untrusted DATA. It is never placed in the system prompt, never treated as instructions, and the agent has no tool that can act on it beyond search, compare and explain. Add tests with malicious listing text.
 5. PRIVACY. Collect minimum personal data. No precise location unless the user opts in; pincode/locality is enough. No selling or sharing data. Provide data export and delete.
 6. SECRETS. Only in .env (git-ignored). Commit .env.example. Never log API keys, tokens or full user queries containing personal data.
-7. OFFICIAL DOCS FIRST. For every library, API and tool you use, read its current official documentation before writing code, and record the version and doc link in docs/. If your memory conflicts with the docs, the docs win. Pin versions.
-8. NO SCOPE CREEP. Build what is listed here. Record proposals in docs/PROPOSALS.md and wait for approval.
-9. WORK IN PHASES. Plan, get approval, build, run the phase gate, write docs/progress/phase-X.md with real command output, commit and tag, then STOP and wait.
+7. OFFICIAL DOCS FIRST. For every library, API and tool you use, read its current official documentation before writing code. If your memory conflicts with the docs, the docs win. Pin versions.
+8. NO SCOPE CREEP. Build what is listed here. Ask before adding unrelated features.
+9. WORK IN PHASES. Plan, get approval, build, run the phase gate, commit and tag, then STOP and wait.
 
-# TECH STACK (justify any change in docs/DECISIONS.md)
+# TECH STACK
 
 - Language: TypeScript everywhere (Node 24 LTS, check at nodejs.org).
 - Web: Next.js (App Router) + React + Tailwind CSS, PWA-ready, i18n with next-intl or similar.
@@ -95,7 +95,7 @@ Claude with tools: `search_products`, `search_food`, `search_grocery`, `search_p
 - Streaming, tool-call transparency panel ("what I checked"), and a hard cap on tool calls and tokens per request.
 - Use prompt caching for the static system prompt and tool definitions where the docs support it.
 - Conversation memory limited to the session; user preferences (budget, veg only, preferred locality) saved only with consent.
-- Evaluation harness: at least 40 scripted scenarios per vertical with expected behaviours (including adversarial prompt injection in listing text, missing data, conflicting data, non-Chennai locations), run with `npm run eval`, results saved in docs/progress/.
+- Evaluation harness: at least 40 scripted scenarios per vertical with expected behaviours (including adversarial prompt injection in listing text, missing data, conflicting data, non-Chennai locations), run with `npm run eval` and report results to stdout.
 
 ## 8. Web app
 Pages: Home (search + vertical tabs + locality picker), Results (filters, sort, compare table, "why this ranking"), Product/Property detail (offers across platforms, price history, similar), Agent chat (side panel and full page), Grocery list planner, Saved items and alerts, Source health/freshness (admin), About/Transparency page that states clearly which sources are used, how data is obtained and that prices may differ at checkout. Performance budget: LCP under 2.5 s on mid-range mobile; accessibility WCAG 2.2 AA; works offline for saved lists.
@@ -104,28 +104,22 @@ Monetisation (optional, disclose it): affiliate links are labelled "affiliate li
 ## 9. Security and abuse
 Auth with email magic link or OAuth (optional for browsing), rate limiting per IP/user, CSRF protection, strict CSP, input validation, SSRF protection on any user-submitted URL (allow-list of domains, resolve and block private IP ranges), output encoding, dependency audit, secrets scan.
 
-# DOCUMENTATION (the owner will study from this; same style as a thesis appendix)
-
-Create docs/ FIRST (Phase A) before code, as a blueprint set that later phases follow:
-- 00-agent-rules, 01-project-report (abstract, problem, objectives, literature/market survey with real, verifiable sources only, gap, methodology, design, evaluation plan, limitations, ethics, conclusion), 02-requirements-and-features (IDs, priorities, acceptance tests), 03-architecture (diagrams in Mermaid, data flows, decisions with rejected alternatives), 04-tech-stack-and-mac-setup (exact versions, install commands with official-doc links), 05-data-model, 06-data-acquisition-and-compliance (tier policy, per-source status, ONDC notes), 07-matching-and-ranking-algorithms (maths, pseudocode, complexity, why chosen), 08-agent-design-and-safety, 09-api, 10-frontend, 11-implementation-walkthrough (phases, steps, gates), 12-testing-and-evaluation, 13-code-map, 14-study-guide-and-glossary, 15-open-questions.
-Keep docs/ in sync with code. Any `[FILL IN]` or `[VERIFY]` must be listed in 15-open-questions.
-
 # PHASES (stop after each; wait for my approval)
 
-Phase A: Research and blueprint. Read official docs for the stack, ONDC, and each source's robots.txt/terms (as public documents). Produce the docs set above, a compliance matrix per source, and a list of decisions you need from me (API keys I have, which sources to enable, hosting). Do not write app code.
+Phase A: Research and blueprint. Read official docs for the stack, ONDC, and each source's robots.txt/terms (as public documents). Produce a compliance matrix per source and a list of decisions you need from me (API keys I have, which sources to enable, hosting). Do not write app code.
 Phase B: Scaffold and data layer. Monorepo, Docker Compose, migrations, canonical schemas, locality seed data, FixtureAdapter with realistic Chennai data for all four verticals, adapter wrapper (robots gate, rate limit, cache, circuit breaker). Gate: tests green, `docker compose up` works, fixture search returns data.
 Phase C: Matching and ranking. Normalisation, entity resolution with evaluation set and metrics, Bayesian rating, landed-cost calculation, best-value score, cart-splitting solver. Gate: evaluation report and unit tests with the maths verified by hand-computed cases.
 Phase D: Real data sources (only with my approval per source). Official API adapters, ONDC client, manual import, user-submitted prices. Any scraper is allowed only after I confirm the source. Gate: per-source compliance record and health checks.
 Phase E: The agent. Tool layer, system prompt, streaming, safety, evals including prompt-injection tests. Gate: `npm run eval` report.
 Phase F: Web app. All pages, i18n (English/Tamil), accessibility and performance checks, PWA. Gate: Playwright e2e for the four headline user stories above.
-Phase G: Hardening and delivery. Security review, load test, observability, deployment guide (document a free/low-cost option), final report and demo script.
+Phase G: Hardening and delivery. Security review, load test, observability, and deployment to a free/low-cost option.
 
 # HOW TO WORK
 
 - Start by restating the goal in 5 lines and listing what you still need from me. Ask me questions in one batch, then proceed.
 - Use plan mode for each phase; keep a TODO list; commit per step as `phase-X: message`; tag `phase-X-done`.
-- Run real commands and paste real output into docs/progress/phase-X.md. Never claim something works without running it.
+- Run real commands and report their actual output. Never claim something works without running it.
 - Prefer small, reviewable steps. If a step takes more than ~30 minutes of work, split it.
 - If you are unsure, stop and ask instead of guessing, especially about legality, credentials, money and data.
 
-Definition of done for the whole project: the four headline user stories work end to end on fixture data and on every enabled real source; every price on screen has source and freshness; the agent passes the eval suite including injection tests; docs are complete and match the code.
+Definition of done for the whole project: the four headline user stories work end to end on fixture data and on every enabled real source; every price on screen has source and freshness; the agent passes the eval suite including injection tests.

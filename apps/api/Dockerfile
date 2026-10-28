@@ -1,4 +1,4 @@
-# API image. Runs TypeScript directly with tsx (see docs/DECISIONS.md).
+# API image. Runs TypeScript directly with tsx.
 FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production

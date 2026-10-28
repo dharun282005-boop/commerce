@@ -272,7 +272,7 @@ export function matchProducts(a: ProductOffer, b: ProductOffer): MatchResult {
   if (code)
     return { decision: 'same', confidence: 0.95, layer: 'identifier', reason: `same model code (${code})` };
 
-  // Layer 3: fuzzy title similarity. (Layer 4, embeddings, is an optional nudge: see docs/07.)
+  // Layer 3: fuzzy title similarity. Embeddings are an optional nudge.
   return fuzzyDecision(fuzzyScore(a.title, b.title));
 }
 

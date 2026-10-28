@@ -3,7 +3,7 @@ import { SourceError, type Compliance, type RawOffer, type SourceAdapter } from 
 /**
  * Tier 1 placeholders for official APIs. They ship DISABLED and do nothing until the owner has
  * credentials, has accepted the API terms, and approves the source (rule 1, Phase D).
- * Names and terms must be confirmed in the official docs first (docs/06, docs/15).
+ * Names and terms must be confirmed in the official documentation first.
  */
 function officialStub(id: string, name: string, termsUrl: string, notes: string): SourceAdapter {
   const compliance: Compliance = {
